@@ -25,7 +25,7 @@ html { scroll-behavior: smooth; }
 body {
   background: var(--cream);
   color: var(--ink);
-  font-family: 'Jost', sans-serif;
+  font-family: 'Source Code Pro', monospace;
   font-weight: 300;
   overflow-x: hidden;
 }
@@ -50,7 +50,7 @@ nav.scrolled {
 }
 
 .nav-logo {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: 'New Amsterdam', sans-serif;
   font-size: 22px;
   font-weight: 300;
   letter-spacing: .12em;
@@ -146,7 +146,7 @@ nav.scrolled {
 }
 
 .hero-title {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: 'New Amsterdam', sans-serif;
   font-size: clamp(56px, 8vw, 110px);
   font-weight: 300;
   line-height: .9;
@@ -206,7 +206,7 @@ nav.scrolled {
   background: none;
   border: 1px solid rgba(26,24,20,.2);
   color: var(--muted);
-  font-family: 'Jost', sans-serif;
+  font-family: 'Source Code Pro', monospace;
   font-size: 9px;
   font-weight: 300;
   letter-spacing: .2em;
@@ -245,7 +245,7 @@ nav.scrolled {
 }
 
 .section-title {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: 'New Amsterdam', sans-serif;
   font-size: clamp(32px, 5vw, 56px);
   font-weight: 300;
   letter-spacing: .02em;
@@ -408,7 +408,7 @@ body.layout-column .img-grid > div {
   cursor: pointer;
   transition: color .2s;
   line-height: 1;
-  font-family: 'Jost', sans-serif;
+  font-family: 'Source Code Pro', monospace;
   font-weight: 200;
 }
 
@@ -425,7 +425,7 @@ body.layout-column .img-grid > div {
   padding: 16px;
   transition: color .2s;
   line-height: 1;
-  font-family: 'Jost', sans-serif;
+  font-family: 'Source Code Pro', monospace;
   font-weight: 100;
 }
 
@@ -461,7 +461,7 @@ body.layout-column .img-grid > div {
 }
 
 .about-text {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: 'New Amsterdam', sans-serif;
   font-size: clamp(22px, 3vw, 34px);
   font-weight: 300;
   line-height: 1.5;
@@ -528,7 +528,7 @@ body.layout-column .img-grid > div {
 }
 
 .ct {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: 'New Amsterdam', sans-serif;
   font-size: clamp(36px, 5vw, 64px);
   font-weight: 300;
   line-height: 1.1;
@@ -780,7 +780,7 @@ footer span {
   color: #fff;
   text-decoration: none;
   text-transform: uppercase;
-  font-family: 'Cormorant Garamond', serif;
+  font-family: 'New Amsterdam', sans-serif;
   font-size: clamp(42px, 5vw, 78px);
   font-weight: 400;
   line-height: .95;
@@ -855,3 +855,973 @@ footer span {
   }
 }
 
+
+/* ============================================================
+   CORREZIONE PUNTO 3.1 — navigazione desktop
+   Riferimento: header minimale con logo a sinistra e menu
+   perfettamente centrato rispetto all'intera viewport.
+   ============================================================ */
+@media (min-width: 769px) {
+  .site-nav {
+    height: 44px;
+    padding: 0 72px;
+    justify-content: flex-start;
+  }
+
+  .site-nav .nav-logo {
+    flex: 0 0 auto;
+  }
+
+  .site-nav .nav-links {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    gap: 34px;
+  }
+
+  .site-nav.scrolled {
+    height: 44px;
+    padding: 0 72px;
+  }
+
+  /* Home: barra bianca compatta come nel riferimento allegato. */
+  .page-home .nav-over-media {
+    background: #fff;
+    border-bottom: 1px solid rgba(26,24,20,.08);
+  }
+
+  .page-home .nav-over-media .nav-logo,
+  .page-home .nav-over-media .nav-links a {
+    color: var(--ink);
+  }
+
+  .page-home .nav-over-media.scrolled {
+    background: rgba(255,255,255,.96);
+    border-bottom-color: rgba(26,24,20,.08);
+  }
+
+  /* Works resta scura per integrarsi con la schermata categorie. */
+  .page-works .nav-on-dark {
+    background: #000;
+    border-bottom: 1px solid rgba(255,255,255,.08);
+  }
+
+  .page-works .nav-on-dark.scrolled {
+    background: rgba(0,0,0,.96);
+    border-bottom-color: rgba(255,255,255,.12);
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .site-nav,
+  .site-nav.scrolled {
+    padding-left: 32px;
+    padding-right: 32px;
+  }
+}
+/* ============================================================
+   PUNTI 3.2 + 3.2bis
+   About con hero come sfondo; Works con sfondo fotografico
+   in dissolvenza ogni 4 s; singole sezioni su pagine dedicate.
+   ============================================================ */
+
+/* --- 3.2: ABOUT ------------------------------------------- */
+.page-about {
+  min-height: 100vh;
+  color: #fff;
+  background-color: #111;
+  background-image:
+    linear-gradient(rgba(0,0,0,.48), rgba(0,0,0,.48)),
+    var(--about-bg-image, none);
+  background-position: center center, center center;
+  background-size: cover, cover;
+  background-attachment: fixed, fixed;
+  background-repeat: no-repeat, no-repeat;
+}
+
+.page-about .nav-over-about .nav-logo,
+.page-about .nav-over-about .nav-links a {
+  color: #fff;
+}
+
+.page-about .nav-over-about .nav-hamburger span {
+  background: #fff;
+}
+
+.page-about .nav-over-about.scrolled {
+  background: rgba(0,0,0,.58);
+  border-bottom-color: rgba(255,255,255,.14);
+}
+
+.page-about .about-page-main,
+.page-about #about,
+.page-about #contact,
+.page-about footer {
+  background: transparent;
+}
+
+.page-about #about {
+  border-top: 0;
+}
+
+.page-about .about-text,
+.page-about .about-detail,
+.page-about .svc,
+.page-about .ct,
+.page-about .cv {
+  color: #fff;
+}
+
+.page-about .about-detail {
+  border-left-color: rgba(255,255,255,.7);
+}
+
+.page-about .svc::before {
+  background: rgba(255,255,255,.7);
+}
+
+.page-about .clabel,
+.page-about footer span {
+  color: rgba(255,255,255,.62);
+}
+
+.page-about footer {
+  border-top-color: rgba(255,255,255,.18);
+}
+
+/* --- 3.2bis: WORKS INDEX / BACKGROUND --------------------- */
+.page-works {
+  min-height: 100vh;
+  background: #000;
+}
+
+.works-background {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  background: #000;
+  pointer-events: none;
+}
+
+.works-background-layer {
+  position: absolute;
+  inset: 0;
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  opacity: 0;
+  transform: scale(1.002);
+  transition: opacity .9s ease;
+}
+
+.works-background-layer.is-visible {
+  opacity: 1;
+}
+
+.works-background-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,.46);
+}
+
+.page-works .site-nav,
+.page-works main {
+  position: relative;
+  z-index: 2;
+}
+
+.page-works .nav-on-dark,
+.page-works .nav-on-dark.scrolled {
+  background: #000;
+  border-bottom-color: rgba(255,255,255,.12);
+  backdrop-filter: none;
+}
+
+.works-index {
+  min-height: 100vh;
+  background: transparent !important;
+}
+
+.works-category {
+  text-shadow: 0 2px 18px rgba(0,0,0,.45);
+}
+
+/* ============================================================
+   PAGINE WORK — LAYOUT CANONICO 3.2bis
+   Ordine approvato: menu → galleria orizzontale → numero/descrizione
+   → navigazione precedente / categoria corrente / successiva.
+   ============================================================ */
+.page-work-detail {
+  background: var(--cream);
+  color: var(--ink);
+}
+
+/* Barra superiore: stessa impostazione del resto del sito. */
+.page-work-detail .project-site-nav,
+.page-work-detail .project-site-nav.scrolled {
+  height: 44px;
+  background: rgba(247,244,239,.98);
+  border-bottom: 1px solid rgba(26,24,20,.08);
+  backdrop-filter: blur(8px);
+}
+
+.page-work-detail .project-site-nav .nav-logo,
+.page-work-detail .project-site-nav .nav-links a {
+  color: var(--ink);
+}
+
+.page-work-detail .project-site-nav .nav-hamburger span {
+  background: var(--ink);
+}
+
+.project-page-main {
+  padding-top: 44px;
+}
+
+/* La galleria è il primo contenuto, subito sotto il menu. */
+.project-gallery-section {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.page-work-detail .project-horizontal-gallery {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 0 48px 34px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  column-count: unset;
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+  -webkit-overflow-scrolling: touch;
+}
+
+.page-work-detail .project-horizontal-gallery > .img-wrap {
+  flex: 0 0 auto;
+  width: auto;
+  height: clamp(380px, 66vh, 760px);
+  margin: 0;
+  break-inside: auto;
+  overflow: hidden;
+}
+
+.page-work-detail .project-horizontal-gallery .img-wrap:hover {
+  transform: none;
+}
+
+.page-work-detail .project-horizontal-gallery img {
+  display: block;
+  width: auto;
+  height: 100%;
+  max-width: none;
+  object-fit: contain;
+}
+
+/* Metadati: soltanto numero e descrizione, con ampio respiro. */
+.project-info {
+  display: grid;
+  grid-template-columns: minmax(80px, 140px) minmax(0, 1fr);
+  align-items: start;
+  gap: 56px;
+  padding: 72px 64px 64px;
+  border-top: 1px solid rgba(26,24,20,.08);
+}
+
+.project-info-number {
+  font-size: 10px;
+  letter-spacing: .25em;
+  color: var(--accent);
+  padding-top: 5px;
+}
+
+.project-info-desc {
+  max-width: 480px;
+  justify-self: end;
+  font-size: 12px;
+  line-height: 1.9;
+  color: var(--muted);
+  text-align: left;
+}
+
+/*
+  Questo elemento è un <nav>, quindi va esplicitamente sottratto alle
+  regole globali `nav { position: fixed; ... }`: deve stare in fondo
+  al normale flusso della pagina, non sovrapporsi alla galleria.
+*/
+.project-pagination {
+  position: static;
+  top: auto;
+  right: auto;
+  bottom: auto;
+  left: auto;
+  z-index: auto;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  width: 100%;
+  margin: 0;
+  padding: 58px 64px 70px;
+  gap: 44px;
+  background: var(--cream);
+  border-top: 1px solid rgba(26,24,20,.10);
+  transition: none;
+}
+
+.project-pagination-link {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  min-width: 0;
+  color: var(--ink);
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+.project-pagination-prev {
+  justify-self: start;
+  text-align: left;
+}
+
+.project-pagination-next {
+  justify-self: end;
+  justify-content: flex-end;
+  text-align: right;
+}
+
+.project-pagination-current {
+  justify-self: center;
+  font-family: 'New Amsterdam', sans-serif;
+  font-size: clamp(30px, 3.4vw, 54px);
+  font-weight: 400;
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.project-pagination-arrow {
+  flex: 0 0 auto;
+  font-family: Arial, sans-serif;
+  font-size: clamp(40px, 4vw, 62px);
+  font-weight: 200;
+  line-height: 1;
+}
+
+.project-pagination-label {
+  font-family: 'New Amsterdam', sans-serif;
+  font-size: clamp(26px, 3vw, 48px);
+  font-weight: 400;
+  line-height: 1.05;
+  white-space: nowrap;
+}
+
+.project-pagination-link:hover .project-pagination-label,
+.project-pagination-link:focus-visible .project-pagination-label {
+  text-decoration: underline;
+  text-underline-offset: .14em;
+  text-decoration-thickness: 1px;
+}
+
+/* Frecce laterali delle versioni precedenti: definitivamente disattivate. */
+.project-side-navigation,
+.project-side-link,
+.project-layout-switcher {
+  display: none !important;
+}
+
+@media (max-width: 1024px) {
+  .page-work-detail .project-horizontal-gallery {
+    padding-left: 32px;
+    padding-right: 32px;
+  }
+
+  .project-info {
+    padding-left: 32px;
+    padding-right: 32px;
+    gap: 32px;
+  }
+
+  .project-pagination {
+    padding-left: 32px;
+    padding-right: 32px;
+    gap: 24px;
+  }
+}
+
+@media (max-width: 768px) {
+  .page-about {
+    background-attachment: scroll;
+    background-position: center;
+  }
+
+  .page-about .nav-over-about .nav-links {
+    background: rgba(0,0,0,.96);
+  }
+
+  .page-about .nav-over-about .nav-links a {
+    color: #fff;
+  }
+
+  .page-works .nav-on-dark,
+  .page-works .nav-on-dark.scrolled {
+    background: rgba(0,0,0,.24);
+  }
+
+  .project-page-main {
+    padding-top: 58px;
+  }
+
+  .page-work-detail .project-site-nav,
+  .page-work-detail .project-site-nav.scrolled {
+    height: auto;
+  }
+
+  .page-work-detail .project-site-nav .nav-links {
+    background: rgba(247,244,239,.99);
+  }
+
+  .page-work-detail .project-site-nav .nav-links a {
+    color: var(--ink);
+  }
+
+  .page-work-detail .project-horizontal-gallery {
+    gap: 6px;
+    padding: 0 20px 26px;
+  }
+
+  .page-work-detail .project-horizontal-gallery > .img-wrap {
+    height: 58svh;
+    min-height: 320px;
+    max-height: 620px;
+  }
+
+  .project-info {
+    grid-template-columns: 1fr;
+    gap: 22px;
+    padding: 48px 20px 44px;
+  }
+
+  .project-info-desc {
+    justify-self: start;
+    max-width: 34rem;
+  }
+
+  .project-pagination {
+    grid-template-columns: 1fr;
+    gap: 28px;
+    padding: 40px 20px 48px;
+  }
+
+  .project-pagination-current {
+    grid-row: 1;
+    justify-self: center;
+    font-size: clamp(30px, 10vw, 44px);
+  }
+
+  .project-pagination-prev {
+    grid-row: 2;
+    justify-self: start;
+  }
+
+  .project-pagination-next {
+    grid-row: 3;
+    justify-self: end;
+  }
+
+  .project-pagination-arrow {
+    font-size: 36px;
+  }
+
+  .project-pagination-label {
+    font-size: clamp(24px, 8vw, 36px);
+  }
+}
+
+/* ============================================================
+   PUNTI 3.4 / 3.6 / 3.7 / 3.9
+   Home wall continuo | lingua IT/EN | 3 temi | font approvati
+   ============================================================ */
+
+/* --- 3.9: tipografia -------------------------------------- */
+body,
+button,
+input,
+textarea,
+select {
+  font-family: 'Source Code Pro', monospace;
+}
+
+.nav-logo,
+.works-category,
+.section-title,
+.project-pagination-current,
+.project-pagination-label,
+.ct,
+.hero-title {
+  font-family: 'New Amsterdam', sans-serif;
+}
+
+/* --- 3.7: palette temi ------------------------------------ */
+:root,
+html[data-theme="white"] {
+  --theme-bg: #ffffff;
+  --theme-text: #111111;
+  --theme-muted: #6f6f6f;
+  --theme-accent: #111111;
+  --theme-accent-2: #737373;
+  --theme-border: rgba(17,17,17,.12);
+  --theme-nav-bg: rgba(255,255,255,.97);
+  --theme-nav-menu-bg: rgba(255,255,255,.99);
+  --theme-on-media: #ffffff;
+  --theme-on-media-muted: rgba(255,255,255,.70);
+  --theme-on-media-accent: #ffffff;
+  --theme-contact-bg: #111111;
+  --theme-contact-text: #ffffff;
+}
+
+html[data-theme="dark"] {
+  --theme-bg: #0A0A0A;
+  --theme-text: #F4F1EA;
+  --theme-muted: #929292;
+  --theme-accent: #FFFFFF;
+  --theme-accent-2: #929292;
+  --theme-border: rgba(244,241,234,.15);
+  --theme-nav-bg: rgba(10,10,10,.97);
+  --theme-nav-menu-bg: rgba(10,10,10,.99);
+  --theme-on-media: #F4F1EA;
+  --theme-on-media-muted: rgba(244,241,234,.70);
+  --theme-on-media-accent: #FFFFFF;
+  --theme-contact-bg: #0A0A0A;
+  --theme-contact-text: #F4F1EA;
+}
+
+html[data-theme="retro"] {
+  --theme-bg: #F6EBD8;
+  --theme-text: #171717;
+  --theme-muted: #725AC1;
+  --theme-accent: #F45B69;
+  --theme-accent-2: #00A6A6;
+  --theme-border: rgba(20,125,126,.28);
+  --theme-nav-bg: rgba(246,235,216,.97);
+  --theme-nav-menu-bg: rgba(246,235,216,.99);
+  --theme-on-media: #F6EBD8;
+  --theme-on-media-muted: rgba(246,235,216,.78);
+  --theme-on-media-accent: #F45B69;
+  --theme-contact-bg: #725AC1;
+  --theme-contact-text: #F6EBD8;
+}
+
+body:not(.page-works):not(.page-about) {
+  background: var(--theme-bg);
+  color: var(--theme-text);
+}
+
+/* I dettagli progetto seguono il tema senza cambiare il layout approvato. */
+.page-work-detail,
+.page-work-detail .project-pagination {
+  background: var(--theme-bg);
+  color: var(--theme-text);
+}
+
+.page-work-detail .project-info {
+  border-top-color: var(--theme-border);
+}
+
+.page-work-detail .project-pagination {
+  border-top-color: var(--theme-border);
+}
+
+.page-work-detail .project-info-number {
+  color: var(--theme-accent);
+}
+
+.page-work-detail .project-info-desc {
+  color: var(--theme-muted);
+}
+
+.page-work-detail .project-pagination-link,
+.page-work-detail .project-pagination-current {
+  color: var(--theme-text);
+}
+
+.page-work-detail .project-pagination-arrow {
+  color: var(--theme-accent);
+}
+
+/* Header Home e pagine progetto: cambia con il tema. */
+.page-home .nav-over-media,
+.page-home .nav-over-media.scrolled,
+.page-work-detail .project-site-nav,
+.page-work-detail .project-site-nav.scrolled {
+  background: var(--theme-nav-bg) !important;
+  border-bottom-color: var(--theme-border) !important;
+}
+
+.page-home .nav-over-media .nav-logo,
+.page-home .nav-over-media .nav-links a,
+.page-work-detail .project-site-nav .nav-logo,
+.page-work-detail .project-site-nav .nav-links a {
+  color: var(--theme-text) !important;
+}
+
+.page-home .nav-over-media .nav-hamburger span,
+.page-work-detail .project-site-nav .nav-hamburger span {
+  background: var(--theme-text) !important;
+}
+
+.nav-links a[aria-current="page"]::after {
+  background: var(--theme-accent);
+}
+
+html[data-theme="retro"] .page-work-detail .project-pagination-link:hover,
+html[data-theme="retro"] .page-work-detail .project-pagination-link:focus-visible,
+html[data-theme="retro"] .page-home .nav-links a:hover {
+  color: var(--theme-accent-2) !important;
+}
+
+/* Works deve rimanere nero per requisito 3.2bis, anche cambiando tema. */
+.page-works,
+.page-works .works-background {
+  background-color: #000;
+}
+
+.page-works .works-index {
+  background: transparent !important;
+}
+
+.page-works .works-category {
+  color: var(--theme-on-media);
+}
+
+.page-works .works-category:hover,
+.page-works .works-category:focus-visible {
+  color: var(--theme-on-media-accent);
+}
+
+/* About conserva la fotografia di sfondo; il tema agisce sugli accenti. */
+.page-about .about-label,
+.page-about .ct em {
+  color: var(--theme-on-media-accent);
+}
+
+.page-about .about-detail,
+.page-about .svc::before {
+  border-color: var(--theme-on-media-accent);
+}
+
+/* Contatto/footer su pagine non About. About resta trasparente come già approvato. */
+body:not(.page-about) #contact,
+body:not(.page-about) footer {
+  background: var(--theme-contact-bg);
+  color: var(--theme-contact-text);
+}
+
+/* --- Controlli lingua/tema -------------------------------- */
+.nav-actions {
+  position: absolute;
+  right: 72px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  z-index: 102;
+}
+
+.nav-action {
+  min-width: 42px;
+  height: 24px;
+  padding: 0 8px;
+  border: 1px solid var(--theme-border);
+  background: transparent;
+  color: var(--theme-text);
+  font-family: 'Source Code Pro', monospace;
+  font-size: 9px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: border-color .2s ease, color .2s ease, background .2s ease;
+}
+
+.nav-action:hover,
+.nav-action:focus-visible {
+  color: var(--theme-accent);
+  border-color: var(--theme-accent);
+  outline: none;
+}
+
+.page-works .nav-action,
+.page-about .nav-action {
+  color: var(--theme-on-media);
+  border-color: rgba(255,255,255,.35);
+}
+
+.page-works .nav-action:hover,
+.page-works .nav-action:focus-visible,
+.page-about .nav-action:hover,
+.page-about .nav-action:focus-visible {
+  color: var(--theme-on-media-accent);
+  border-color: var(--theme-on-media-accent);
+}
+
+html[data-theme="retro"] .nav-action {
+  border-color: var(--theme-accent-2);
+}
+
+/* Header più leggibile: logo, menu e controlli aumentati in proporzione. */
+.site-nav .nav-logo {
+  font-size: 28px;
+}
+
+.site-nav .nav-links a {
+  font-size: 12px;
+}
+
+.nav-action {
+  min-width: 48px;
+  height: 28px;
+  padding: 0 10px;
+  font-size: 11px;
+}
+
+/* --- 3.4: Home wall --------------------------------------- */
+.page-home {
+  min-height: 100svh;
+  overflow: hidden;
+}
+
+.home-wall-main {
+  width: 100%;
+  height: 100svh;
+  overflow: hidden;
+}
+
+/* Scorrimento manuale: orizzontale desktop, verticale mobile. */
+.home-wall {
+  position: fixed;
+  top: 44px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  background: var(--theme-bg);
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  cursor: grab;
+}
+
+.home-wall::-webkit-scrollbar {
+  display: none;
+}
+
+.home-wall.is-dragging {
+  cursor: grabbing;
+}
+
+.home-wall-track {
+  display: flex;
+  flex-direction: row;
+  width: max-content;
+  min-width: 100%;
+  height: 100%;
+}
+
+.home-wall-sequence {
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: row;
+  align-items: stretch;
+  height: 100%;
+  gap: 6px;
+  padding-right: 6px;
+}
+
+.home-wall-item {
+  flex: 0 0 auto;
+  height: 100%;
+  overflow: hidden;
+  background: var(--theme-bg);
+}
+
+.home-wall-item img {
+  display: block;
+  width: auto;
+  height: 100%;
+  max-width: none;
+  object-fit: contain;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* Le vecchie hero della Home non fanno più parte del punto 3.4. */
+.page-home .hero {
+  display: none !important;
+}
+
+/* --- Font nelle aree d'impatto ---------------------------- */
+.works-category,
+.project-pagination-current,
+.project-pagination-label,
+.nav-logo,
+.ct {
+  font-family: 'New Amsterdam', sans-serif;
+  font-weight: 400;
+}
+
+.works-category {
+  letter-spacing: .015em;
+}
+
+.project-pagination-current,
+.project-pagination-label {
+  letter-spacing: .01em;
+}
+
+/* Il layout orizzontale delle pagine categoria resta orizzontale anche mobile. */
+.page-work-detail .project-horizontal-gallery {
+  flex-direction: row !important;
+}
+
+@media (max-width: 1024px) {
+  .nav-actions {
+    right: 32px;
+  }
+}
+
+@media (max-width: 768px) {
+  .site-nav {
+    min-height: 58px;
+  }
+
+  .nav-actions {
+    position: absolute;
+    right: 60px;
+    top: 50%;
+    transform: translateY(-50%);
+    gap: 5px;
+  }
+
+  .site-nav .nav-logo {
+    font-size: 25px;
+  }
+
+  .site-nav .nav-links a {
+    font-size: 15px;
+  }
+
+  .nav-action {
+    min-width: 40px;
+    height: 25px;
+    padding: 0 7px;
+    font-size: 9px;
+  }
+
+  .page-home .nav-over-media .nav-links,
+  .page-work-detail .project-site-nav .nav-links {
+    background: var(--theme-nav-menu-bg) !important;
+  }
+
+  .page-home .nav-over-media .nav-links a,
+  .page-work-detail .project-site-nav .nav-links a {
+    color: var(--theme-text) !important;
+  }
+
+  .home-wall {
+    top: 58px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    cursor: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .home-wall-track {
+    flex-direction: column;
+    width: 100%;
+    height: max-content;
+  }
+
+  .home-wall-sequence {
+    flex-direction: column;
+    width: 100%;
+    height: auto;
+    gap: 6px;
+    padding-right: 0;
+    padding-bottom: 6px;
+  }
+
+  .home-wall-item {
+    width: 100%;
+    height: auto;
+  }
+
+  .home-wall-item img {
+    width: 100%;
+    height: auto;
+    max-width: 100%;
+  }
+
+  .page-work-detail .project-horizontal-gallery {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    column-count: unset !important;
+  }
+
+  .page-work-detail .project-horizontal-gallery > .img-wrap {
+    flex: 0 0 auto !important;
+    width: auto !important;
+    height: 58svh !important;
+  }
+
+  .page-work-detail .project-horizontal-gallery img {
+    width: auto !important;
+    height: 100% !important;
+    max-width: none !important;
+  }
+}
+
+/* Correzioni contrasto su superfici fotografiche. */
+.page-about .about-detail {
+  border-left-color: var(--theme-on-media-accent);
+}
+
+.page-about .svc::before {
+  background: var(--theme-on-media-accent);
+}
+
+.page-about .nav-links a[aria-current="page"]::after,
+.page-works .nav-links a[aria-current="page"]::after {
+  background: var(--theme-on-media-accent);
+}
+
+/* Titoli/sezioni ad alto impatto: New Amsterdam come da punto 3.9. */
+.section-title,
+.about-label {
+  font-family: 'New Amsterdam', sans-serif;
+  font-weight: 400;
+}
+
+/* ============================================================
+   CORREZIONI APPROVATE — Home manuale / header / Works background
+   ============================================================ */
+/* In Works la fotografia appartiene alla pagina, non alla barra superiore. */
+.page-works .works-index {
+  background: transparent !important;
+}
+
+.page-works .site-nav.nav-on-dark,
+.page-works .site-nav.nav-on-dark.scrolled {
+  background: #000 !important;
+  border-bottom-color: rgba(255,255,255,.12) !important;
+}
