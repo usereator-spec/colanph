@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Jost:wght@300;400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./assets/css/style.css">
+  <title>ColanPh — Photography</title>
+</head>
+<body class="page-home">
+
+<nav id="nav" class="site-nav nav-over-media">
+  <a href="./index.html" class="nav-logo">ColanPh</a>
+
+  <button class="nav-hamburger" id="nav-hamburger" aria-label="Menu" aria-expanded="false">
+    <span></span>
+    <span></span>
+    <span></span>
+  </button>
+
+  <ul class="nav-links" id="nav-links">
+    <li><a href="./index.html" aria-current="page">Home</a></li>
+    <li><a href="./works.html">Works</a></li>
+    <li><a href="./about.html">About</a></li>
+  </ul>
+</nav>
+
+<!-- ============================================================
+     HOME
+     La galleria continua verrà implementata nel punto 3.4.
+     Per il punto 3.1 la Home mantiene l'hero esistente.
+============================================================ -->
+<section class="hero">
+  <picture>
+    <source media="(max-width: 768px)" srcset="./assets/img/hero/ritratti fabio-14">
+    <img class="hero-bg" src="./assets/img/hero/ritratti fabio-18.jpg" alt="ColanPh hero">
+  </picture>
+  <div class="hero-content">
+    <p class="hero-label">Photography Portfolio</p>
+    <h1 class="hero-title">Colan<em>Ph</em></h1>
+  </div>
+</section>
+
+<script src="./assets/js/main.js"></script>
+</body>
+</html>
