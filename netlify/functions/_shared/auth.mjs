@@ -13,7 +13,7 @@ export async function requireAdmin(request, { verifyOrigin = false } = {}) {
   if (!user) {
     return { response: Response.json({ error: 'Non autenticato.' }, { status: 401 }) };
   }
-  if (!Array.isArray(user.roles) || !user.roles.includes('admin')) {
+  if (!Array.isArray(user.roles) || !user.roles.some(role => String(role).toLowerCase() === 'admin')) {
     return { response: Response.json({ error: 'Accesso riservato agli amministratori.' }, { status: 403 }) };
   }
   return { user };

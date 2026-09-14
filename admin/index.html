@@ -26,6 +26,8 @@
   <main class="admin-shell">
     <nav class="admin-tabs" aria-label="Gestione contenuti">
       <button type="button" class="admin-tab is-active" data-tab="home">Home</button>
+      <button type="button" class="admin-tab" data-tab="about">About</button>
+      <button type="button" class="admin-tab" data-tab="appearance">Aspetto</button>
       <button type="button" class="admin-tab" data-tab="sections">Sezioni</button>
       <button type="button" class="admin-tab" data-tab="projects">Progetti / Lavori</button>
     </nav>
@@ -40,6 +42,48 @@
         </div>
       </div>
       <div class="sortable-list home-sortable" id="home-order-list"></div>
+    </section>
+
+    <section class="admin-panel" data-panel="about">
+      <div class="admin-panel-heading">
+        <div>
+          <h1>Pagina About</h1>
+          <p>Modifica i testi e i contatti mostrati nella pagina About. I campi IT/EN seguono il selettore lingua pubblico.</p>
+        </div>
+      </div>
+      <div class="editor-card about-admin-card">
+        <div class="editor-fields two-columns" id="about-editor">
+          <label>Etichetta IT<input data-about-field="label.it" type="text" /></label>
+          <label>Etichetta EN<input data-about-field="label.en" type="text" /></label>
+          <label class="full-width">Introduzione IT<textarea data-about-field="intro.it" rows="3"></textarea></label>
+          <label class="full-width">Introduzione EN<textarea data-about-field="intro.en" rows="3"></textarea></label>
+          <label class="full-width">Testo dettaglio IT<textarea data-about-field="detail.it" rows="5"></textarea></label>
+          <label class="full-width">Testo dettaglio EN<textarea data-about-field="detail.en" rows="5"></textarea></label>
+          <label class="full-width">Servizi IT — uno per riga<textarea data-about-list="services.it" rows="7"></textarea></label>
+          <label class="full-width">Servizi EN — uno per riga<textarea data-about-list="services.en" rows="7"></textarea></label>
+          <label>Titolo contatto IT<input data-about-field="contactTitle.it" type="text" /></label>
+          <label>Titolo contatto EN<input data-about-field="contactTitle.en" type="text" /></label>
+          <label>Enfasi contatto IT<input data-about-field="contactEmphasis.it" type="text" /></label>
+          <label>Enfasi contatto EN<input data-about-field="contactEmphasis.en" type="text" /></label>
+          <label>Telefono<input data-about-field="phone" type="text" /></label>
+          <label>Link telefono / WhatsApp<input data-about-field="phoneHref" type="url" /></label>
+          <label>Email<input data-about-field="email" type="email" /></label>
+          <label>Instagram — testo<input data-about-field="instagram" type="text" /></label>
+          <label class="full-width">Instagram — URL<input data-about-field="instagramUrl" type="url" /></label>
+          <label>Disponibilità IT<input data-about-field="availability.it" type="text" /></label>
+          <label>Disponibilità EN<input data-about-field="availability.en" type="text" /></label>
+        </div>
+      </div>
+    </section>
+
+    <section class="admin-panel" data-panel="appearance">
+      <div class="admin-panel-heading">
+        <div>
+          <h1>Aspetto pagine</h1>
+          <p>Scegli il tema primario Bianco, Nero o 80's e, se vuoi, sovrascrivi i colori di sfondo, titoli e didascalie con un codice #RRGGBB. Lascia i colori vuoti per usare la palette del tema.</p>
+        </div>
+      </div>
+      <div class="appearance-grid" id="page-appearance-editors"></div>
     </section>
 
     <section class="admin-panel" data-panel="sections">
@@ -76,6 +120,22 @@
         <label class="full-width">Descrizione IT<textarea data-field="description.it" rows="3"></textarea></label>
         <label class="full-width">Descrizione EN<textarea data-field="description.en" rows="3"></textarea></label>
       </div>
+
+      <div class="item-appearance-block">
+        <h3>Aspetto di questa pagina</h3>
+        <p>Puoi ereditare l'aspetto generale delle pagine Work oppure personalizzare questa singola sezione/progetto.</p>
+        <div class="editor-fields two-columns" data-item-appearance></div>
+      </div>
+
+      <div class="section-merge-block" data-section-merge hidden>
+        <h3>Sposta / unisci sezione</h3>
+        <p>Sposta tutte le fotografie di questa sezione in un'altra sezione e rimuove quella corrente. L'ordine Home delle foto resta invariato.</p>
+        <div class="inline-action-row">
+          <select data-section-merge-target></select>
+          <button type="button" data-section-merge-button>Sposta e unisci</button>
+        </div>
+      </div>
+
       <div class="photo-editor-heading">
         <div><h3>Fotografie</h3><p>Massimo 10 MB per file. Per file più grandi usa prima lo script di preparazione.</p></div>
         <label class="upload-button">+ Aggiungi foto<input data-upload-input type="file" accept="image/jpeg,image/png,image/webp,image/avif" multiple hidden /></label>

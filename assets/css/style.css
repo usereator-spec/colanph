@@ -2218,3 +2218,69 @@ html[data-theme="retro"] .nav-action {
     z-index: 3001 !important;
   }
 }
+
+/* ============================================================
+   ADMIN-CONTROLLED PAGE APPEARANCE
+   --page-background-color / --page-title-color / --page-caption-color
+   are injected by site-content.js from Netlify Blobs.
+   ============================================================ */
+
+.page-home {
+  background-color: var(--page-background-color, var(--theme-bg));
+}
+.home-wall {
+  background-color: var(--page-background-color, var(--theme-bg));
+}
+
+.page-works,
+.page-works .works-background {
+  background-color: var(--page-background-color, #000000) !important;
+}
+.page-works .works-group-title,
+.page-works .works-category {
+  color: var(--page-title-color, var(--theme-on-media)) !important;
+}
+.page-works .works-empty {
+  color: var(--page-caption-color, var(--theme-on-media-muted)) !important;
+}
+
+.page-work-detail,
+.page-work-detail .project-pagination {
+  background-color: var(--page-background-color, var(--theme-bg)) !important;
+}
+.page-work-detail .project-pagination-current,
+.page-work-detail .project-pagination-label,
+.page-work-detail .project-pagination-link {
+  color: var(--page-title-color, var(--theme-text)) !important;
+}
+.page-work-detail .project-info-desc,
+.page-work-detail .work-photo-caption {
+  color: var(--page-caption-color, var(--theme-muted)) !important;
+}
+
+.page-about {
+  background-color: var(--page-background-color, #111111) !important;
+}
+.page-about .about-label,
+.page-about .ct,
+.page-about .ct em {
+  color: var(--page-title-color, var(--theme-on-media-accent)) !important;
+}
+.page-about .about-text,
+.page-about .about-detail,
+.page-about .svc,
+.page-about .cv,
+.page-about .clabel,
+.page-about footer span {
+  color: var(--page-caption-color, #ffffff) !important;
+}
+
+/* About keeps the photograph; the configured background color becomes its overlay tint. */
+.page-about {
+  background-image:
+    linear-gradient(
+      color-mix(in srgb, var(--page-background-color, #000000) 48%, transparent),
+      color-mix(in srgb, var(--page-background-color, #000000) 48%, transparent)
+    ),
+    var(--about-bg-image, none);
+}

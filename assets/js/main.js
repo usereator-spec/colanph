@@ -139,6 +139,13 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  document.addEventListener('colanph:pagetheme', event => {
+    const theme = event.detail?.theme;
+    if (!THEMES.includes(theme)) return;
+    currentTheme = theme;
+    refreshControlLabels();
+  });
+
   /* --------------------------------------------------------
      NAVBAR
   -------------------------------------------------------- */

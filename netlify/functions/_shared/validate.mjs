@@ -1,8 +1,34 @@
 const SLUG_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const PUBLIC_ID_RE = /^colanph\/[A-Za-z0-9_\-/]+$/;
+const HEX_RE = /^#[0-9a-fA-F]{6}$/;
+const THEMES = new Set(['white', 'dark', 'retro', 'inherit']);
 
 function isLocalizedText(value) {
   return value && typeof value === 'object' && typeof value.it === 'string' && typeof value.en === 'string';
+}
+
+function normalizeLocalized(value, fallback = { it: '', en: '' }) {
+  const source = isLocalizedText(value) ? value : fallback;
+  return { it: String(source.it || '').trim(), en: String(source.en || '').trim() };
+}
+
+function normalizeColor(value) {
+  const color = String(value || '').trim();
+  if (!color) return '';
+  if (!HEX_RE.test(color)) throw new Error(`Colore non valido: ${color}. Usa il formato #RRGGBB.`);
+  return color.toUpperCase();
+}
+
+function normalizeAppearance(value, { allowInherit = true, fallbackTheme = 'white' } = {}) {
+  const source = value && typeof value === 'object' ? value : {};
+  let theme = String(source.theme || fallbackTheme).trim();
+  if (!THEMES.has(theme) || (!allowInherit && theme === 'inherit')) theme = fallbackTheme;
+  return {
+    theme,
+    backgroundColor: normalizeColor(source.backgroundColor),
+    titleColor: normalizeColor(source.titleColor),
+    captionColor: normalizeColor(source.captionColor)
+  };
 }
 
 function normalizeImage(image) {
@@ -14,13 +40,13 @@ function normalizeImage(image) {
   if (!Number.isFinite(width) || width <= 0 || !Number.isFinite(height) || height <= 0) {
     throw new Error(`Dimensioni immagine non valide per ${publicId}.`);
   }
-  const caption = isLocalizedText(image.caption) ? image.caption : { it: '', en: '' };
+  const caption = normalizeLocalized(image.caption);
   return {
     id: publicId,
     publicId,
     width: Math.round(width),
     height: Math.round(height),
-    caption: { it: caption.it.trim(), en: caption.en.trim() }
+    caption
   };
 }
 
@@ -29,7 +55,7 @@ function normalizeCollectionItem(item, type, order) {
   const slug = String(item.slug || '').trim().toLowerCase();
   if (!SLUG_RE.test(slug)) throw new Error(`Slug non valido: ${slug || '(vuoto)'}`);
   if (!isLocalizedText(item.title) || !item.title.it.trim()) throw new Error(`Titolo italiano mancante per ${slug}.`);
-  const description = isLocalizedText(item.description) ? item.description : { it: '', en: '' };
+  const description = normalizeLocalized(item.description);
   const images = Array.isArray(item.images) ? item.images.map(normalizeImage) : [];
   const seen = new Set();
   for (const image of images) {
@@ -41,9 +67,40 @@ function normalizeCollectionItem(item, type, order) {
     type,
     slug,
     order,
-    title: { it: item.title.it.trim(), en: item.title.en.trim() },
-    description: { it: description.it.trim(), en: description.en.trim() },
+    title: normalizeLocalized(item.title),
+    description,
+    appearance: normalizeAppearance(item.appearance, { allowInherit: true, fallbackTheme: 'inherit' }),
     images
+  };
+}
+
+function normalizeAbout(value) {
+  const source = value && typeof value === 'object' ? value : {};
+  const services = source.services && typeof source.services === 'object' ? source.services : {};
+  const list = lang => Array.isArray(services[lang])
+    ? services[lang].map(entry => String(entry || '').trim()).filter(Boolean).slice(0, 30)
+    : [];
+
+  const backgroundPublicId = String(source.backgroundPublicId || 'colanph/hero/ritratti-fabio-18').trim();
+  const profilePublicId = String(source.profilePublicId || 'colanph/profile/profile').trim();
+  if (!PUBLIC_ID_RE.test(backgroundPublicId)) throw new Error('Public ID sfondo About non valido.');
+  if (!PUBLIC_ID_RE.test(profilePublicId)) throw new Error('Public ID profilo About non valido.');
+
+  return {
+    label: normalizeLocalized(source.label, { it: 'About', en: 'About' }),
+    intro: normalizeLocalized(source.intro),
+    detail: normalizeLocalized(source.detail),
+    services: { it: list('it'), en: list('en') },
+    contactTitle: normalizeLocalized(source.contactTitle),
+    contactEmphasis: normalizeLocalized(source.contactEmphasis),
+    phone: String(source.phone || '').trim(),
+    phoneHref: String(source.phoneHref || '').trim(),
+    email: String(source.email || '').trim(),
+    instagram: String(source.instagram || '').trim(),
+    instagramUrl: String(source.instagramUrl || '').trim(),
+    availability: normalizeLocalized(source.availability),
+    backgroundPublicId,
+    profilePublicId
   };
 }
 
@@ -73,12 +130,22 @@ export function normalizeSiteData(input) {
     }
   }
 
+  const pageSettingsRaw = input.pageSettings && typeof input.pageSettings === 'object' ? input.pageSettings : {};
+  const pageSettings = {
+    home: normalizeAppearance(pageSettingsRaw.home, { allowInherit: false, fallbackTheme: 'white' }),
+    works: normalizeAppearance(pageSettingsRaw.works, { allowInherit: false, fallbackTheme: 'dark' }),
+    about: normalizeAppearance(pageSettingsRaw.about, { allowInherit: false, fallbackTheme: 'dark' }),
+    work: normalizeAppearance(pageSettingsRaw.work, { allowInherit: false, fallbackTheme: 'white' })
+  };
+
   return {
-    version: 1,
+    version: 2,
     updatedAt: new Date().toISOString(),
     sections,
     projects,
-    home: { order: homeOrder }
+    home: { order: homeOrder },
+    pageSettings,
+    about: normalizeAbout(input.about)
   };
 }
 

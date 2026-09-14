@@ -2,6 +2,25 @@
   'use strict';
 
   const MAX_FILE_BYTES = 10 * 1024 * 1024;
+  const THEMES = [
+    ['white', 'Bianco'],
+    ['dark', 'Nero'],
+    ['retro', "80's"]
+  ];
+  const DEFAULT_APPEARANCE = { theme: 'white', backgroundColor: '', titleColor: '', captionColor: '' };
+  const DEFAULT_ABOUT = {
+    label: { it: 'About', en: 'About' },
+    intro: { it: 'Fotografo freelance specializzato in food, eventi, architettura, ritratti, fashion e street photography.', en: 'Freelance photographer specialising in food, events, architecture, portraits, fashion and street photography.' },
+    detail: { it: 'Collaboro con ristoranti, chef, agenzie di comunicazione e brand nel settore food & hospitality. Ogni progetto è un racconto visivo costruito con cura, dalla pre-produzione allo scatto finale.', en: 'I collaborate with restaurants, chefs, communication agencies and brands in food and hospitality. Every project is a visual story developed with care, from pre-production to the final shot.' },
+    services: { it: ['Food Photography', 'Ritratti — Artisti & Attori', 'Fashion', 'Architettura & Interni', 'Street Photography', 'Eventi & Concerti'], en: ['Food Photography', 'Portraits — Artists & Actors', 'Fashion', 'Architecture & Interiors', 'Street Photography', 'Events & Concerts'] },
+    contactTitle: { it: 'Iniziamo a', en: "Let's" },
+    contactEmphasis: { it: 'lavorare insieme.', en: 'work together.' },
+    phone: '+39 347 899 7588', phoneHref: 'https://wa.me/393478997588', email: 'fabiocolan.ph@gmail.com', instagram: '@fabiocolan_ph', instagramUrl: 'https://www.instagram.com/fabiocolan_ph/',
+    availability: { it: 'Disponibile per nuovi progetti', en: 'Available for new projects' },
+    backgroundPublicId: 'colanph/hero/ritratti-fabio-18',
+    profilePublicId: 'colanph/profile/profile'
+  };
+
   const state = {
     data: null,
     etag: null,
@@ -13,23 +32,21 @@
   const publishButton = document.getElementById('publish-button');
   const adminUser = document.getElementById('admin-user');
 
+  const clone = value => structuredClone(value);
   const setStatus = (message, error = false) => {
     status.textContent = message;
     status.classList.toggle('is-error', error);
   };
-
   const markDirty = () => {
     state.dirty = true;
     publishButton.disabled = false;
     publishButton.textContent = 'Pubblica modifiche *';
   };
-
   const markClean = () => {
     state.dirty = false;
     publishButton.disabled = true;
     publishButton.textContent = 'Pubblica modifiche';
   };
-
   const collection = type => type === 'project' ? state.data.projects : state.data.sections;
   const editorRoot = type => document.getElementById(type === 'project' ? 'project-editor' : 'section-editor');
   const listRoot = type => document.getElementById(type === 'project' ? 'projects-list' : 'sections-list');
@@ -40,6 +57,61 @@
       .toLowerCase().trim()
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/^-+|-+$/g, '');
+  }
+
+  function uniqueSlug(base, type = 'section', currentId = null) {
+    const root = slugify(base) || (type === 'project' ? 'progetto' : 'sezione');
+    const used = new Set(collection(type).filter(item => item.id !== currentId).map(item => item.slug));
+    if (!used.has(root)) return root;
+    let i = 2;
+    while (used.has(`${root}-${i}`)) i += 1;
+    return `${root}-${i}`;
+  }
+
+  function ensureAppearance(value, theme = 'white') {
+    const source = value && typeof value === 'object' ? value : {};
+    return {
+      theme: source.theme || theme,
+      backgroundColor: source.backgroundColor || '',
+      titleColor: source.titleColor || '',
+      captionColor: source.captionColor || ''
+    };
+  }
+
+  function ensureLocalized(value, fallback = { it: '', en: '' }) {
+    const source = value && typeof value === 'object' ? value : fallback;
+    return { it: String(source.it || ''), en: String(source.en || '') };
+  }
+
+  function ensureAdminDefaults(data) {
+    data.sections ||= [];
+    data.projects ||= [];
+    data.home ||= { order: [] };
+    data.home.order ||= [];
+    data.pageSettings ||= {};
+    data.pageSettings.home = ensureAppearance(data.pageSettings.home, 'white');
+    data.pageSettings.works = ensureAppearance(data.pageSettings.works, 'dark');
+    data.pageSettings.about = ensureAppearance(data.pageSettings.about, 'dark');
+    data.pageSettings.work = ensureAppearance(data.pageSettings.work, 'white');
+
+    data.about = { ...clone(DEFAULT_ABOUT), ...(data.about || {}) };
+    for (const field of ['label', 'intro', 'detail', 'contactTitle', 'contactEmphasis', 'availability']) {
+      data.about[field] = ensureLocalized(data.about[field], DEFAULT_ABOUT[field]);
+    }
+    data.about.services ||= { it: [], en: [] };
+    data.about.services.it = Array.isArray(data.about.services.it) ? data.about.services.it : [];
+    data.about.services.en = Array.isArray(data.about.services.en) ? data.about.services.en : [];
+    data.about.backgroundPublicId ||= DEFAULT_ABOUT.backgroundPublicId;
+    data.about.profilePublicId ||= DEFAULT_ABOUT.profilePublicId;
+
+    for (const item of [...data.sections, ...data.projects]) {
+      item.title = ensureLocalized(item.title);
+      item.description = ensureLocalized(item.description);
+      item.images ||= [];
+      item.appearance = ensureAppearance(item.appearance, 'inherit');
+      for (const image of item.images) image.caption = ensureLocalized(image.caption);
+    }
+    return data;
   }
 
   function allImageOwners() {
@@ -74,6 +146,16 @@
     return `${prefix}: ${item.title.it || item.slug || 'Senza titolo'}`;
   }
 
+  function button(text, label, onClick, className = '') {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.textContent = text;
+    btn.setAttribute('aria-label', label);
+    if (className) btn.className = className;
+    btn.addEventListener('click', onClick);
+    return btn;
+  }
+
   function createHomeRow(publicId, index, ownerMap) {
     const found = ownerMap.get(publicId);
     if (!found) return null;
@@ -102,22 +184,13 @@
 
     const actions = document.createElement('div');
     actions.className = 'row-actions';
-    const up = button('↑', 'Sposta su', () => reorderHome(index, index - 1));
-    const down = button('↓', 'Sposta giù', () => reorderHome(index, index + 1));
-    const remove = button('Togli', 'Togli dalla Home', () => setInHome(publicId, false), 'danger-text');
-    actions.append(up, down, remove);
+    actions.append(
+      button('↑', 'Sposta su', () => reorderHome(index, index - 1)),
+      button('↓', 'Sposta giù', () => reorderHome(index, index + 1)),
+      button('Togli', 'Togli dalla Home', () => setInHome(publicId, false), 'danger-text')
+    );
     row.append(handle, img, info, actions);
     return row;
-  }
-
-  function button(text, label, onClick, className = '') {
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.textContent = text;
-    btn.setAttribute('aria-label', label);
-    if (className) btn.className = className;
-    btn.addEventListener('click', onClick);
-    return btn;
   }
 
   function reorderHome(from, to) {
@@ -149,10 +222,7 @@
         row.classList.add('is-dragging');
         event.dataTransfer.effectAllowed = 'move';
       });
-      row.addEventListener('dragend', () => {
-        row.classList.remove('is-dragging');
-        fromIndex = null;
-      });
+      row.addEventListener('dragend', () => { row.classList.remove('is-dragging'); fromIndex = null; });
       row.addEventListener('dragover', event => event.preventDefault());
       row.addEventListener('drop', event => {
         event.preventDefault();
@@ -184,28 +254,34 @@
     return collection(type).find(item => item.id === state.active[type]) || null;
   }
 
-  function createNewItem(type) {
-    const id = `${type}-${crypto.randomUUID()}`;
-    const item = {
-      id,
+  function createItemObject(type, title = '') {
+    const slug = title ? uniqueSlug(title, type) : '';
+    return {
+      id: `${type}-${crypto.randomUUID()}`,
       type,
-      slug: '',
+      slug,
       order: collection(type).length,
-      title: { it: '', en: '' },
+      title: { it: title, en: '' },
       description: { it: '', en: '' },
+      appearance: { theme: 'inherit', backgroundColor: '', titleColor: '', captionColor: '' },
       images: []
     };
+  }
+
+  function createNewItem(type) {
+    const item = createItemObject(type);
     collection(type).push(item);
-    state.active[type] = id;
+    state.active[type] = item.id;
     markDirty();
     renderCollectionList(type);
     renderEditor(type);
   }
 
   function updateNested(item, path, value) {
-    const [root, key] = path.split('.');
-    if (key) item[root][key] = value;
-    else item[root] = value;
+    const parts = path.split('.');
+    let cursor = item;
+    while (parts.length > 1) cursor = cursor[parts.shift()];
+    cursor[parts[0]] = value;
   }
 
   function deleteItem(type, item) {
@@ -218,9 +294,7 @@
     state.data.home.order = state.data.home.order.filter(id => !removedIds.has(id));
     state.active[type] = items[0]?.id || null;
     markDirty();
-    renderCollectionList(type);
-    renderEditor(type);
-    renderHomeOrder();
+    renderAll();
   }
 
   function removePhoto(type, item, publicId) {
@@ -230,6 +304,94 @@
     markDirty();
     renderEditor(type);
     renderHomeOrder();
+  }
+
+  function findItemByKey(key) {
+    const [type, id] = String(key || '').split(':');
+    const item = collection(type).find(candidate => candidate.id === id);
+    return item ? { type, item } : null;
+  }
+
+  function createDestinationSelect(currentItem) {
+    const select = document.createElement('select');
+    const placeholder = document.createElement('option');
+    placeholder.value = '';
+    placeholder.textContent = 'Sposta foto in…';
+    select.appendChild(placeholder);
+
+    const sectionsGroup = document.createElement('optgroup');
+    sectionsGroup.label = 'Sezioni';
+    state.data.sections.filter(item => item.id !== currentItem.id).forEach(item => {
+      const option = document.createElement('option');
+      option.value = `section:${item.id}`;
+      option.textContent = item.title.it || item.slug;
+      sectionsGroup.appendChild(option);
+    });
+    const newOption = document.createElement('option');
+    newOption.value = '__new_section__';
+    newOption.textContent = '+ Crea nuova sezione…';
+    sectionsGroup.appendChild(newOption);
+    select.appendChild(sectionsGroup);
+
+    const projectsGroup = document.createElement('optgroup');
+    projectsGroup.label = 'Progetti / Lavori';
+    state.data.projects.filter(item => item.id !== currentItem.id).forEach(item => {
+      const option = document.createElement('option');
+      option.value = `project:${item.id}`;
+      option.textContent = item.title.it || item.slug;
+      projectsGroup.appendChild(option);
+    });
+    select.appendChild(projectsGroup);
+    return select;
+  }
+
+  function movePhoto(type, item, image, destinationKey) {
+    let destination;
+    if (destinationKey === '__new_section__') {
+      const title = window.prompt('Nome della nuova sezione:');
+      if (!title?.trim()) return;
+      const created = createItemObject('section', title.trim());
+      state.data.sections.push(created);
+      destination = { type: 'section', item: created };
+    } else {
+      destination = findItemByKey(destinationKey);
+    }
+    if (!destination) return;
+    if (destination.item.images.some(candidate => candidate.publicId === image.publicId)) {
+      window.alert('La fotografia è già presente nella destinazione.');
+      return;
+    }
+    destination.item.images.push(image);
+    item.images = item.images.filter(candidate => candidate.publicId !== image.publicId);
+    markDirty();
+    renderAll();
+    setStatus(`Foto spostata in ${destination.item.title.it || destination.item.slug}. Ricorda di pubblicare.`);
+  }
+
+  function mergeSection(source, targetId) {
+    const target = state.data.sections.find(item => item.id === targetId);
+    if (!target || target.id === source.id) return;
+    const sourceLabel = source.title.it || source.slug;
+    const targetLabel = target.title.it || target.slug;
+    if (!window.confirm(`Spostare tutte le foto di “${sourceLabel}” in “${targetLabel}” e rimuovere la sezione “${sourceLabel}”?`)) return;
+    const existing = new Set(target.images.map(image => image.publicId));
+    source.images.forEach(image => { if (!existing.has(image.publicId)) target.images.push(image); });
+    state.data.sections = state.data.sections.filter(item => item.id !== source.id);
+    state.active.section = target.id;
+    markDirty();
+    renderAll();
+    setStatus(`Sezione “${sourceLabel}” unita a “${targetLabel}”. Ricorda di pubblicare.`);
+  }
+
+  function labelledInput(labelText, value, onInput) {
+    const label = document.createElement('label');
+    label.textContent = labelText;
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.value = value || '';
+    input.addEventListener('input', () => onInput(input.value));
+    label.appendChild(input);
+    return label;
   }
 
   function createPhotoRow(type, item, image) {
@@ -255,29 +417,111 @@
     fields.append(captionIt, captionEn, homeLabel);
 
     const actions = document.createElement('div');
-    actions.className = 'photo-row-actions';
-    actions.append(button('Rimuovi foto', 'Rimuovi fotografia', () => removePhoto(type, item, image.publicId), 'danger-button'));
+    actions.className = 'photo-row-actions photo-actions-stack';
+    const destination = createDestinationSelect(item);
+    const moveButton = button('Sposta', 'Sposta fotografia', () => {
+      if (!destination.value) return;
+      movePhoto(type, item, image, destination.value);
+    });
+    const moveWrap = document.createElement('div');
+    moveWrap.className = 'photo-move-control';
+    moveWrap.append(destination, moveButton);
+    actions.append(moveWrap, button('Rimuovi foto', 'Rimuovi fotografia', () => removePhoto(type, item, image.publicId), 'danger-button'));
 
     row.append(img, fields, actions);
     return row;
   }
 
-  function labelledInput(labelText, value, onInput) {
+  function createThemeSelect(current, allowInherit, onChange) {
+    const select = document.createElement('select');
+    if (allowInherit) {
+      const inherit = document.createElement('option');
+      inherit.value = 'inherit';
+      inherit.textContent = 'Eredita impostazione generale Work';
+      select.appendChild(inherit);
+    }
+    THEMES.forEach(([value, label]) => {
+      const option = document.createElement('option');
+      option.value = value;
+      option.textContent = label;
+      select.appendChild(option);
+    });
+    select.value = current || (allowInherit ? 'inherit' : 'white');
+    select.addEventListener('change', () => onChange(select.value));
+    return select;
+  }
+
+  function colorField(labelText, value, onInput) {
     const label = document.createElement('label');
     label.textContent = labelText;
     const input = document.createElement('input');
     input.type = 'text';
+    input.placeholder = '#RRGGBB — opzionale';
+    input.pattern = '#[0-9A-Fa-f]{6}';
     input.value = value || '';
-    input.addEventListener('input', () => onInput(input.value));
+    input.addEventListener('input', () => onInput(input.value.trim()));
     label.appendChild(input);
     return label;
   }
 
-  async function uploadFiles(type, item, files, progress) {
-    if (!item.slug || !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(item.slug)) {
-      throw new Error('Prima inserisci uno slug URL valido.');
-    }
+  function fillAppearanceFields(root, target, allowInherit = false) {
+    root.replaceChildren();
+    const themeLabel = document.createElement('label');
+    themeLabel.textContent = 'Tema primario';
+    themeLabel.appendChild(createThemeSelect(target.theme, allowInherit, value => { target.theme = value; markDirty(); }));
+    root.append(
+      themeLabel,
+      colorField('Colore sfondo', target.backgroundColor, value => { target.backgroundColor = value; markDirty(); }),
+      colorField('Colore titoli', target.titleColor, value => { target.titleColor = value; markDirty(); }),
+      colorField('Colore didascalie / testo secondario', target.captionColor, value => { target.captionColor = value; markDirty(); })
+    );
+  }
 
+  function renderPageAppearance() {
+    const root = document.getElementById('page-appearance-editors');
+    if (!root || !state.data) return;
+    const pages = [
+      ['home', 'Home'],
+      ['works', 'Works'],
+      ['about', 'About'],
+      ['work', 'Pagine Sezione / Progetto — predefinito']
+    ];
+    root.replaceChildren(...pages.map(([key, title]) => {
+      const card = document.createElement('div');
+      card.className = 'appearance-card';
+      const h2 = document.createElement('h2');
+      h2.textContent = title;
+      const fields = document.createElement('div');
+      fields.className = 'editor-fields';
+      fillAppearanceFields(fields, state.data.pageSettings[key], false);
+      card.append(h2, fields);
+      return card;
+    }));
+  }
+
+  function renderAboutEditor() {
+    const root = document.getElementById('about-editor');
+    if (!root || !state.data) return;
+    root.querySelectorAll('[data-about-field]').forEach(field => {
+      const path = field.dataset.aboutField;
+      const parts = path.split('.');
+      let value = state.data.about;
+      parts.forEach(part => { value = value?.[part]; });
+      field.value = value || '';
+      field.oninput = () => { updateNested(state.data.about, path, field.value); markDirty(); };
+    });
+    root.querySelectorAll('[data-about-list]').forEach(field => {
+      const [rootKey, lang] = field.dataset.aboutList.split('.');
+      field.value = (state.data.about[rootKey]?.[lang] || []).join('\n');
+      field.oninput = () => {
+        state.data.about[rootKey][lang] = field.value.split(/\r?\n/).map(value => value.trim()).filter(Boolean);
+        markDirty();
+      };
+    });
+  }
+
+  async function uploadFiles(type, item, files, progress) {
+    if (!item.slug || !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(item.slug)) throw new Error('Prima inserisci uno slug URL valido.');
     const validFiles = [...files];
     for (const file of validFiles) {
       if (file.size > MAX_FILE_BYTES) throw new Error(`${file.name} supera 10 MB. Preparalo prima con lo script di compressione.`);
@@ -286,31 +530,21 @@
       const uid = crypto.randomUUID().replace(/-/g, '').slice(0, 12);
       const folder = type === 'project' ? 'projects' : 'sections';
       const publicId = `colanph/${folder}/${item.slug}/${base}-${uid}`;
-
       const signResponse = await fetch('/.netlify/functions/cloudinary-sign', {
         method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ publicId })
       });
       const signed = await signResponse.json();
       if (!signResponse.ok) throw new Error(signed.error || 'Firma Cloudinary non disponibile.');
-
       const form = new FormData();
       form.append('file', file);
       form.append('api_key', signed.apiKey);
       form.append('timestamp', String(signed.timestamp));
       form.append('signature', signed.signature);
       form.append('public_id', signed.publicId);
-
       const uploadResponse = await fetch(`https://api.cloudinary.com/v1_1/${encodeURIComponent(signed.cloudName)}/image/upload`, { method: 'POST', body: form });
       const uploaded = await uploadResponse.json();
       if (!uploadResponse.ok) throw new Error(uploaded?.error?.message || `Upload fallito: ${file.name}`);
-
-      item.images.push({
-        id: uploaded.public_id,
-        publicId: uploaded.public_id,
-        width: uploaded.width,
-        height: uploaded.height,
-        caption: { it: '', en: '' }
-      });
+      item.images.push({ id: uploaded.public_id, publicId: uploaded.public_id, width: uploaded.width, height: uploaded.height, caption: { it: '', en: '' } });
       markDirty();
     }
     progress.textContent = validFiles.length ? 'Upload completato. Ricorda di pubblicare le modifiche.' : '';
@@ -336,13 +570,15 @@
     let slugManuallyEdited = Boolean(item.slug);
     fragment.querySelectorAll('[data-field]').forEach(field => {
       const path = field.dataset.field;
-      const [rootKey, childKey] = path.split('.');
-      field.value = childKey ? item[rootKey][childKey] : item[rootKey];
+      const parts = path.split('.');
+      let value = item;
+      parts.forEach(part => { value = value?.[part]; });
+      field.value = value || '';
       field.addEventListener('input', () => {
         updateNested(item, path, field.value);
         if (path === 'slug') slugManuallyEdited = true;
         if (path === 'title.it' && !slugManuallyEdited) {
-          item.slug = slugify(field.value);
+          item.slug = uniqueSlug(field.value, type, item.id);
           const slugField = card.querySelector('[data-field="slug"]');
           if (slugField) slugField.value = item.slug;
         }
@@ -354,6 +590,25 @@
         markDirty();
       });
     });
+
+    fillAppearanceFields(fragment.querySelector('[data-item-appearance]'), item.appearance, true);
+
+    const mergeBlock = fragment.querySelector('[data-section-merge]');
+    if (type === 'section' && state.data.sections.length > 1) {
+      mergeBlock.hidden = false;
+      const select = mergeBlock.querySelector('[data-section-merge-target]');
+      select.replaceChildren();
+      const placeholder = document.createElement('option');
+      placeholder.value = ''; placeholder.textContent = 'Scegli sezione destinazione…';
+      select.appendChild(placeholder);
+      state.data.sections.filter(candidate => candidate.id !== item.id).forEach(candidate => {
+        const option = document.createElement('option');
+        option.value = candidate.id;
+        option.textContent = candidate.title.it || candidate.slug;
+        select.appendChild(option);
+      });
+      mergeBlock.querySelector('[data-section-merge-button]').addEventListener('click', () => { if (select.value) mergeSection(item, select.value); });
+    }
 
     const photoList = fragment.querySelector('[data-photo-list]');
     photoList.replaceChildren(...item.images.map(image => createPhotoRow(type, item, image)));
@@ -380,15 +635,17 @@
         uploadInput.value = '';
       }
     });
-
     root.appendChild(fragment);
   }
 
   function renderAll() {
     renderHomeOrder();
+    renderAboutEditor();
+    renderPageAppearance();
     for (const type of ['section', 'project']) {
       const items = collection(type);
       if (!state.active[type] && items.length) state.active[type] = items[0].id;
+      if (state.active[type] && !items.some(item => item.id === state.active[type])) state.active[type] = items[0]?.id || null;
       renderCollectionList(type);
       renderEditor(type);
     }
@@ -397,13 +654,10 @@
   async function load() {
     setStatus('Caricamento contenuti…');
     const response = await fetch('/.netlify/functions/admin-data', { credentials: 'same-origin', cache: 'no-store' });
-    if (response.status === 401 || response.status === 403) {
-      window.location.assign('/login.html');
-      return;
-    }
+    if (response.status === 401 || response.status === 403) { window.location.assign('/login.html'); return; }
     const payload = await response.json();
     if (!response.ok) throw new Error(payload.error || 'Impossibile caricare i dati.');
-    state.data = payload.data;
+    state.data = ensureAdminDefaults(payload.data);
     state.etag = payload.etag;
     adminUser.textContent = payload.user?.email || '';
     markClean();
@@ -421,7 +675,7 @@
       });
       const payload = await response.json();
       if (!response.ok) throw new Error(payload.error || 'Pubblicazione non riuscita.');
-      state.data = payload.data;
+      state.data = ensureAdminDefaults(payload.data);
       state.etag = payload.etag;
       markClean();
       renderAll();
@@ -438,20 +692,12 @@
       document.querySelectorAll('.admin-panel').forEach(panel => panel.classList.toggle('is-active', panel.dataset.panel === tab.dataset.tab));
     });
   });
-
-  document.querySelectorAll('[data-new-type]').forEach(button => {
-    button.addEventListener('click', () => createNewItem(button.dataset.newType));
-  });
-
+  document.querySelectorAll('[data-new-type]').forEach(button => button.addEventListener('click', () => createNewItem(button.dataset.newType)));
   publishButton.addEventListener('click', publish);
   document.getElementById('logout-button').addEventListener('click', async () => {
-    try {
-      await fetch('/.netlify/functions/auth-logout', { method: 'POST', credentials: 'same-origin' });
-    } finally {
-      window.location.assign('/login.html');
-    }
+    try { await fetch('/.netlify/functions/auth-logout', { method: 'POST', credentials: 'same-origin' }); }
+    finally { window.location.assign('/login.html'); }
   });
-
   window.addEventListener('beforeunload', event => {
     if (!state.dirty) return;
     event.preventDefault();

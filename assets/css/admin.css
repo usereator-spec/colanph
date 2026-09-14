@@ -115,3 +115,87 @@ input:focus, textarea:focus { border-color: var(--text); }
   .photo-row { grid-template-columns: 1fr; }
   .admin-photo-preview { width: 100%; height: auto; max-height: 260px; }
 }
+
+/* --- Extended admin: About, page appearance, move controls --- */
+.appearance-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.appearance-card,
+.item-appearance-block,
+.section-merge-block {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  padding: 20px;
+}
+
+.appearance-card h2,
+.item-appearance-block h3,
+.section-merge-block h3 {
+  margin: 0 0 8px;
+  font: 1.7rem/1 var(--font-impact);
+  text-transform: uppercase;
+}
+
+.item-appearance-block,
+.section-merge-block {
+  margin-top: 26px;
+}
+
+.item-appearance-block p,
+.section-merge-block p {
+  margin: 0 0 16px;
+  color: var(--muted);
+  font-size: .75rem;
+  line-height: 1.55;
+}
+
+select {
+  width: 100%;
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--text);
+  padding: 11px 12px;
+  outline: none;
+}
+
+select:focus { border-color: var(--text); }
+
+.inline-action-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+}
+
+.inline-action-row button,
+.photo-move-control button {
+  border: 1px solid var(--text);
+  background: var(--text);
+  color: #fff;
+  padding: 10px 12px;
+}
+
+.photo-actions-stack {
+  display: grid;
+  gap: 10px;
+  min-width: 220px;
+}
+
+.photo-move-control {
+  display: grid;
+  gap: 7px;
+}
+
+.about-admin-card { max-width: 1100px; }
+
+@media (max-width: 900px) {
+  .appearance-grid { grid-template-columns: 1fr; }
+  .photo-actions-stack { min-width: 0; grid-column: 1 / -1; }
+}
+
+@media (max-width: 620px) {
+  .inline-action-row { grid-template-columns: 1fr; }
+}

@@ -1,5 +1,5 @@
 export const INITIAL_DATA = Object.freeze({
-  "version": 1,
+  "version": 2,
   "updatedAt": null,
   "sections": [
     {
@@ -206,7 +206,13 @@ export const INITIAL_DATA = Object.freeze({
             "en": ""
           }
         }
-      ]
+      ],
+      "appearance": {
+        "theme": "inherit",
+        "backgroundColor": "",
+        "titleColor": "",
+        "captionColor": ""
+      }
     },
     {
       "id": "architecture",
@@ -292,7 +298,13 @@ export const INITIAL_DATA = Object.freeze({
             "en": ""
           }
         }
-      ]
+      ],
+      "appearance": {
+        "theme": "inherit",
+        "backgroundColor": "",
+        "titleColor": "",
+        "captionColor": ""
+      }
     },
     {
       "id": "street",
@@ -598,7 +610,13 @@ export const INITIAL_DATA = Object.freeze({
             "en": ""
           }
         }
-      ]
+      ],
+      "appearance": {
+        "theme": "inherit",
+        "backgroundColor": "",
+        "titleColor": "",
+        "captionColor": ""
+      }
     },
     {
       "id": "food",
@@ -734,7 +752,13 @@ export const INITIAL_DATA = Object.freeze({
             "en": ""
           }
         }
-      ]
+      ],
+      "appearance": {
+        "theme": "inherit",
+        "backgroundColor": "",
+        "titleColor": "",
+        "captionColor": ""
+      }
     },
     {
       "id": "interiors",
@@ -870,7 +894,13 @@ export const INITIAL_DATA = Object.freeze({
             "en": ""
           }
         }
-      ]
+      ],
+      "appearance": {
+        "theme": "inherit",
+        "backgroundColor": "",
+        "titleColor": "",
+        "captionColor": ""
+      }
     },
     {
       "id": "activity",
@@ -996,7 +1026,13 @@ export const INITIAL_DATA = Object.freeze({
             "en": ""
           }
         }
-      ]
+      ],
+      "appearance": {
+        "theme": "inherit",
+        "backgroundColor": "",
+        "titleColor": "",
+        "captionColor": ""
+      }
     }
   ],
   "projects": [],
@@ -1093,5 +1129,82 @@ export const INITIAL_DATA = Object.freeze({
       "colanph/arch/arch06",
       "colanph/arch/arch07"
     ]
+  },
+  "pageSettings": {
+    "home": {
+      "theme": "white",
+      "backgroundColor": "",
+      "titleColor": "",
+      "captionColor": ""
+    },
+    "works": {
+      "theme": "dark",
+      "backgroundColor": "#000000",
+      "titleColor": "#FFFFFF",
+      "captionColor": "#F4F1EA"
+    },
+    "about": {
+      "theme": "dark",
+      "backgroundColor": "",
+      "titleColor": "#FFFFFF",
+      "captionColor": "#F4F1EA"
+    },
+    "work": {
+      "theme": "white",
+      "backgroundColor": "",
+      "titleColor": "",
+      "captionColor": ""
+    }
+  },
+  "about": {
+    "label": {
+      "it": "About",
+      "en": "About"
+    },
+    "intro": {
+      "it": "Fotografo freelance specializzato in food, eventi, architettura, ritratti, fashion e street photography.",
+      "en": "Freelance photographer specialising in food, events, architecture, portraits, fashion and street photography."
+    },
+    "detail": {
+      "it": "Collaboro con ristoranti, chef, agenzie di comunicazione e brand nel settore food & hospitality. Ogni progetto è un racconto visivo costruito con cura, dalla pre-produzione allo scatto finale.",
+      "en": "I collaborate with restaurants, chefs, communication agencies and brands in food and hospitality. Every project is a visual story developed with care, from pre-production to the final shot."
+    },
+    "services": {
+      "it": [
+        "Food Photography",
+        "Ritratti — Artisti & Attori",
+        "Fashion",
+        "Architettura & Interni",
+        "Street Photography",
+        "Eventi & Concerti"
+      ],
+      "en": [
+        "Food Photography",
+        "Portraits — Artists & Actors",
+        "Fashion",
+        "Architecture & Interiors",
+        "Street Photography",
+        "Events & Concerts"
+      ]
+    },
+    "contactTitle": {
+      "it": "Iniziamo a",
+      "en": "Let's"
+    },
+    "contactEmphasis": {
+      "it": "lavorare insieme.",
+      "en": "work together."
+    },
+    "phone": "+39 347 899 7588",
+    "phoneHref": "https://wa.me/393478997588",
+    "email": "fabiocolan.ph@gmail.com",
+    "instagram": "@fabiocolan_ph",
+    "instagramUrl": "https://www.instagram.com/fabiocolan_ph/",
+    "availability": {
+      "it": "Disponibile per nuovi progetti",
+      "en": "Available for new projects"
+    },
+    "backgroundPublicId": "colanph/hero/ritratti-fabio-18",
+    "profilePublicId": "colanph/profile/profile"
   }
 });
