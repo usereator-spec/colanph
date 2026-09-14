@@ -153,16 +153,49 @@
     worksCleanup = () => cleanups.forEach(fn => fn());
   }
 
-  function routeInfo() {
-    const url = new URL(window.location.href);
-    const fromQueryType = url.searchParams.get('type');
-    const fromQuerySlug = url.searchParams.get('slug');
-    if (fromQueryType && fromQuerySlug) return { type: fromQueryType, slug: fromQuerySlug };
+ function routeInfo() {
+  const url = new URL(window.location.href);
 
-    const match = url.pathname.match(/\/works\/(sezioni|progetti)\/([^/?#]+)/);
-    if (!match) return null;
-    return { type: match[1] === 'progetti' ? 'project' : 'section', slug: decodeURIComponent(match[2]) };
+  /*
+   * Prima leggiamo l'URL pubblico.
+   *
+   * Esempi:
+   * /works/sezioni/eventi
+   * /works/sezioni/architettura
+   * /works/progetti/matrimonio-mario-rossi
+   */
+  const match = url.pathname.match(
+    /^\/works\/(sezioni|progetti)\/([^/?#]+)\/?$/
+  );
+
+  if (match) {
+    return {
+      type: match[1] === 'progetti' ? 'project' : 'section',
+      slug: decodeURIComponent(match[2])
+        .trim()
+        .toLowerCase()
+    };
   }
+
+  /*
+   * Fallback utile per aprire direttamente:
+   * /work.html?type=section&slug=eventi
+   */
+  const queryType = url.searchParams.get('type');
+  const querySlug = url.searchParams.get('slug');
+
+  if (queryType && querySlug) {
+    return {
+      type: queryType === 'project' ? 'project' : 'section',
+      slug: decodeURIComponent(querySlug)
+        .replace(/^:/, '')
+        .trim()
+        .toLowerCase()
+    };
+  }
+
+  return null;
+}
 
   function renderWork(data) {
     const info = routeInfo();
