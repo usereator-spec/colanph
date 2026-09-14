@@ -2,11 +2,13 @@
 /admin/*                 /admin/:splat                         200!  Role=admin
 /admin/*                 /login.html                          302!
 
-# URL puliti e data-driven per sezioni e progetti.
+# URL dinamici delle sezioni.
 /works/sezioni/:slug     /work.html?type=section&slug=:slug   200!
+
+# URL dinamici dei progetti.
 /works/progetti/:slug    /work.html?type=project&slug=:slug   200!
 
-# Compatibilità con i vecchi URL delle sei sezioni.
+# Compatibilità con i vecchi URL.
 /work-eventi.html        /works/sezioni/eventi                301!
 /work-architettura.html  /works/sezioni/architettura          301!
 /work-street.html        /works/sezioni/street                301!
