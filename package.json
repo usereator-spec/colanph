@@ -1,0 +1,14 @@
+{
+  "name": "colanph-portfolio",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.mjs"
+  },
+  "dependencies": {
+    "@netlify/blobs": "11.0.3",
+    "@netlify/identity": "2.0.0",
+    "cloudinary": "2.11.0"
+  }
+}

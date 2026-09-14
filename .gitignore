@@ -1,0 +1,21 @@
+# Dipendenze/build
+node_modules/
+dist/
+
+# Credenziali locali
+.env
+.env.*
+!.env.example
+
+# Immagini: sono servite da Cloudinary, non da GitHub
+assets/img/
+assets/cloudinary-ready/
+cloudinary-ready/
+
+# Output degli script di migrazione/upload
+*ready-report.csv
+cloudinary-upload-manifest.json
+
+# Sistema/editor
+.DS_Store
+Thumbs.db

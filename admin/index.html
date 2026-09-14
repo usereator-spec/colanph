@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex,nofollow,noarchive" />
+  <link href="https://fonts.googleapis.com" rel="preconnect" />
+  <link crossorigin href="https://fonts.gstatic.com" rel="preconnect" />
+  <link href="https://fonts.googleapis.com/css2?family=New+Amsterdam&family=Source+Code+Pro:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link href="../assets/css/admin.css" rel="stylesheet" />
+  <title>Admin — ColanPh</title>
+</head>
+<body class="admin-page">
+  <header class="admin-topbar">
+    <div>
+      <div class="admin-brand">ColanPh Admin</div>
+      <div class="admin-user" id="admin-user"></div>
+    </div>
+    <div class="admin-topbar-actions">
+      <a href="../index.html" target="_blank" rel="noopener">Apri sito</a>
+      <button id="publish-button" class="admin-primary" type="button" disabled>Pubblica modifiche</button>
+      <button id="logout-button" type="button">Esci</button>
+    </div>
+  </header>
+
+  <main class="admin-shell">
+    <nav class="admin-tabs" aria-label="Gestione contenuti">
+      <button type="button" class="admin-tab is-active" data-tab="home">Home</button>
+      <button type="button" class="admin-tab" data-tab="sections">Sezioni</button>
+      <button type="button" class="admin-tab" data-tab="projects">Progetti / Lavori</button>
+    </nav>
+
+    <div class="admin-status" id="admin-status" role="status" aria-live="polite">Caricamento…</div>
+
+    <section class="admin-panel is-active" data-panel="home">
+      <div class="admin-panel-heading">
+        <div>
+          <h1>Ordine Home</h1>
+          <p>Trascina le foto per cambiarne l'ordine. Puoi anche usare i pulsanti ↑ e ↓. Le foto vengono aggiunte alla Home dal relativo editor Sezione/Progetto.</p>
+        </div>
+      </div>
+      <div class="sortable-list home-sortable" id="home-order-list"></div>
+    </section>
+
+    <section class="admin-panel" data-panel="sections">
+      <div class="admin-collection-layout">
+        <aside class="admin-collection-sidebar">
+          <div class="admin-sidebar-header"><h1>Sezioni</h1><button type="button" data-new-type="section">+ Nuova</button></div>
+          <div id="sections-list" class="admin-item-list"></div>
+        </aside>
+        <div id="section-editor" class="admin-editor"></div>
+      </div>
+    </section>
+
+    <section class="admin-panel" data-panel="projects">
+      <div class="admin-collection-layout">
+        <aside class="admin-collection-sidebar">
+          <div class="admin-sidebar-header"><h1>Progetti / Lavori</h1><button type="button" data-new-type="project">+ Nuovo</button></div>
+          <div id="projects-list" class="admin-item-list"></div>
+        </aside>
+        <div id="project-editor" class="admin-editor"></div>
+      </div>
+    </section>
+  </main>
+
+  <template id="editor-template">
+    <div class="editor-card">
+      <div class="editor-heading">
+        <h2 data-editor-heading></h2>
+        <button type="button" class="danger-button" data-delete-item>Rimuovi</button>
+      </div>
+      <div class="editor-fields two-columns">
+        <label>Titolo IT<input data-field="title.it" type="text" required /></label>
+        <label>Titolo EN<input data-field="title.en" type="text" /></label>
+        <label class="full-width">Slug URL<input data-field="slug" type="text" pattern="[a-z0-9-]+" required /></label>
+        <label class="full-width">Descrizione IT<textarea data-field="description.it" rows="3"></textarea></label>
+        <label class="full-width">Descrizione EN<textarea data-field="description.en" rows="3"></textarea></label>
+      </div>
+      <div class="photo-editor-heading">
+        <div><h3>Fotografie</h3><p>Massimo 10 MB per file. Per file più grandi usa prima lo script di preparazione.</p></div>
+        <label class="upload-button">+ Aggiungi foto<input data-upload-input type="file" accept="image/jpeg,image/png,image/webp,image/avif" multiple hidden /></label>
+      </div>
+      <div class="upload-progress" data-upload-progress></div>
+      <div class="sortable-list photo-sortable" data-photo-list></div>
+    </div>
+  </template>
+
+  <script src="../assets/js/cloudinary.js"></script>
+  <script src="../assets/js/admin.js"></script>
+</body>
+</html>

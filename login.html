@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex,nofollow,noarchive" />
+  <link href="https://fonts.googleapis.com" rel="preconnect" />
+  <link crossorigin href="https://fonts.gstatic.com" rel="preconnect" />
+  <link href="https://fonts.googleapis.com/css2?family=New+Amsterdam&family=Source+Code+Pro:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link href="./assets/css/admin.css" rel="stylesheet" />
+  <title>Admin — ColanPh</title>
+</head>
+<body class="auth-page">
+  <main class="auth-card">
+    <a class="auth-logo" href="./index.html">ColanPh</a>
+    <h1>Area amministrativa</h1>
+    <p class="auth-help" id="auth-help">Accedi con l'account Netlify Identity autorizzato.</p>
+
+    <form id="login-form" class="auth-form">
+      <label>Email<input id="login-email" name="email" type="email" autocomplete="username" required /></label>
+      <label>Password<input id="login-password" name="password" type="password" autocomplete="current-password" required /></label>
+      <button type="submit">Accedi</button>
+    </form>
+
+    <form id="token-form" class="auth-form" hidden>
+      <label>Nuova password<input id="token-password" type="password" minlength="8" autocomplete="new-password" required /></label>
+      <button type="submit" id="token-submit">Imposta password</button>
+    </form>
+
+    <button class="auth-link-button" id="forgot-password" type="button">Password dimenticata?</button>
+    <form id="recovery-request-form" class="auth-form" hidden>
+      <label>Email<input id="recovery-email" type="email" required /></label>
+      <button type="submit">Invia email di recupero</button>
+    </form>
+    <p class="auth-status" id="auth-status" role="status" aria-live="polite"></p>
+  </main>
+  <script src="./assets/js/login.js"></script>
+</body>
+</html>

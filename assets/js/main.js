@@ -7,6 +7,12 @@
 (() => {
   'use strict';
 
+  const authHash = window.location.hash || '';
+  if (window.location.pathname !== '/login.html' && /#(?:invite_token|recovery_token)=/.test(authHash)) {
+    window.location.replace(`/login.html${authHash}`);
+    return;
+  }
+
   const VALID_THEMES = ['white', 'dark', 'retro'];
   const VALID_LANGUAGES = ['it', 'en'];
 
@@ -101,6 +107,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (persist) safeStorage.set('colanph-language', language);
     refreshControlLabels();
+    document.dispatchEvent(new CustomEvent('colanph:languagechange', { detail: { language } }));
   }
 
   function applyTheme(theme, persist = true) {
@@ -165,101 +172,60 @@ document.addEventListener('DOMContentLoaded', () => {
 
   /* --------------------------------------------------------
      HOME — wall manuale
-     Desktop: scroll orizzontale | Mobile: scroll verticale
-     Nessun autoplay. Su desktop la rotellina verticale muove la galleria
-     in orizzontale; sono supportati anche trackpad e trascinamento.
+     Le fotografie vengono popolate da site-content.js.
+     Desktop: rotellina/trackpad/drag orizzontale | Mobile: scroll verticale.
   -------------------------------------------------------- */
   const homeWall = document.getElementById('home-wall');
-  const homeTrack = document.getElementById('home-wall-track');
-  const homeData = document.getElementById('home-wall-images');
 
-  if (homeWall && homeTrack && homeData && window.ColanPhCloudinary) {
-    let images = [];
-    try {
-      images = JSON.parse(homeData.textContent) || [];
-    } catch (_) {
-      images = [];
-    }
+  if (homeWall) {
+    const mobileQuery = window.matchMedia('(max-width: 768px)');
 
-    if (images.length) {
-      const sequence = document.createElement('div');
-      sequence.className = 'home-wall-sequence';
+    homeWall.addEventListener('wheel', event => {
+      if (mobileQuery.matches) return;
+      const delta = Math.abs(event.deltaY) >= Math.abs(event.deltaX) ? event.deltaY : event.deltaX;
+      if (delta === 0) return;
+      event.preventDefault();
+      homeWall.scrollLeft += delta;
+    }, { passive: false });
 
-      images.forEach((item, index) => {
-        const frame = document.createElement('div');
-        frame.className = 'home-wall-item';
+    let dragging = false;
+    let dragStartX = 0;
+    let dragStartScrollLeft = 0;
 
-        const img = document.createElement('img');
-        img.src = window.ColanPhCloudinary.url(item.id);
-        img.width = Number(item.width) || 1;
-        img.height = Number(item.height) || 1;
-        img.alt = '';
-        img.decoding = 'async';
-        img.loading = index < 6 ? 'eager' : 'lazy';
-        img.draggable = false;
+    homeWall.addEventListener('pointerdown', event => {
+      if (mobileQuery.matches || event.pointerType === 'touch') return;
+      dragging = true;
+      dragStartX = event.clientX;
+      dragStartScrollLeft = homeWall.scrollLeft;
+      homeWall.classList.add('is-dragging');
+      homeWall.setPointerCapture?.(event.pointerId);
+    });
 
-        frame.appendChild(img);
-        sequence.appendChild(frame);
-      });
+    homeWall.addEventListener('pointermove', event => {
+      if (!dragging) return;
+      homeWall.scrollLeft = dragStartScrollLeft - (event.clientX - dragStartX);
+    });
 
-      homeTrack.replaceChildren(sequence);
-
-      const mobileQuery = window.matchMedia('(max-width: 768px)');
-
-      // Desktop: la rotellina verticale controlla lo scroll orizzontale.
-      homeWall.addEventListener('wheel', event => {
-        if (mobileQuery.matches) return;
-        const delta = Math.abs(event.deltaY) >= Math.abs(event.deltaX)
-          ? event.deltaY
-          : event.deltaX;
-        if (delta === 0) return;
-        event.preventDefault();
-        homeWall.scrollLeft += delta;
-      }, { passive: false });
-
-      // Desktop: trascinamento con mouse/puntatore, senza interferire col mobile.
-      let dragging = false;
-      let dragStartX = 0;
-      let dragStartScrollLeft = 0;
-
-      homeWall.addEventListener('pointerdown', event => {
-        if (mobileQuery.matches || event.pointerType === 'touch') return;
-        dragging = true;
-        dragStartX = event.clientX;
-        dragStartScrollLeft = homeWall.scrollLeft;
-        homeWall.classList.add('is-dragging');
-        homeWall.setPointerCapture?.(event.pointerId);
-      });
-
-      homeWall.addEventListener('pointermove', event => {
-        if (!dragging) return;
-        homeWall.scrollLeft = dragStartScrollLeft - (event.clientX - dragStartX);
-      });
-
-      const stopDragging = event => {
-        if (!dragging) return;
-        dragging = false;
-        homeWall.classList.remove('is-dragging');
-        if (event?.pointerId != null && homeWall.hasPointerCapture?.(event.pointerId)) {
-          homeWall.releasePointerCapture(event.pointerId);
-        }
-      };
-
-      homeWall.addEventListener('pointerup', stopDragging);
-      homeWall.addEventListener('pointercancel', stopDragging);
-      homeWall.addEventListener('pointerleave', event => {
-        if (dragging && event.buttons === 0) stopDragging(event);
-      });
-
-      // Al cambio desktop/mobile si riparte dall'inizio nel nuovo asse.
-      const resetHomeScroll = () => {
-        homeWall.scrollLeft = 0;
-        homeWall.scrollTop = 0;
-      };
-      if (typeof mobileQuery.addEventListener === 'function') {
-        mobileQuery.addEventListener('change', resetHomeScroll);
+    const stopDragging = event => {
+      if (!dragging) return;
+      dragging = false;
+      homeWall.classList.remove('is-dragging');
+      if (event?.pointerId != null && homeWall.hasPointerCapture?.(event.pointerId)) {
+        homeWall.releasePointerCapture(event.pointerId);
       }
-    }
+    };
+
+    homeWall.addEventListener('pointerup', stopDragging);
+    homeWall.addEventListener('pointercancel', stopDragging);
+    homeWall.addEventListener('pointerleave', event => {
+      if (dragging && event.buttons === 0) stopDragging(event);
+    });
+
+    const resetHomeScroll = () => {
+      homeWall.scrollLeft = 0;
+      homeWall.scrollTop = 0;
+    };
+    mobileQuery.addEventListener?.('change', resetHomeScroll);
   }
 
   /* --------------------------------------------------------
@@ -340,97 +306,6 @@ document.addEventListener('DOMContentLoaded', () => {
       if (event.key === 'Escape') closeLightbox();
       if (event.key === 'ArrowRight') navigateLightbox(1);
       if (event.key === 'ArrowLeft') navigateLightbox(-1);
-    });
-  }
-
-  /* --------------------------------------------------------
-     WORKS — nero di default; rotazione per categoria solo hover/focus
-     Frequenza: 4 s | fade | sorgente: categoria indicata
-  -------------------------------------------------------- */
-  const worksBackground = document.getElementById('works-background');
-  const worksBgData = document.getElementById('works-bg-images');
-  const workCategories = [...document.querySelectorAll('.works-category[data-work-category]')];
-
-  if (worksBackground && worksBgData && workCategories.length) {
-    const layers = [...worksBackground.querySelectorAll('.works-background-layer')];
-    let categoryMap = {};
-    let rotationTimer = null;
-    let sessionToken = 0;
-    let activeLayer = 0;
-    let currentIndex = 0;
-
-    try {
-      categoryMap = JSON.parse(worksBgData.textContent) || {};
-    } catch (_) {
-      categoryMap = {};
-    }
-
-    const toUrl = publicId => window.ColanPhCloudinary
-      ? window.ColanPhCloudinary.url(publicId)
-      : publicId;
-
-    const clearTimer = () => {
-      if (rotationTimer) {
-        window.clearInterval(rotationTimer);
-        rotationTimer = null;
-      }
-    };
-
-    const setLayerImage = (layerIndex, src) => {
-      layers[layerIndex].style.backgroundImage = `url("${src.replace(/"/g, '\\"')}")`;
-    };
-
-    const fadeToBlack = () => {
-      sessionToken += 1;
-      clearTimer();
-      layers.forEach(layer => layer.classList.remove('is-visible'));
-    };
-
-    const showImage = (src, token) => {
-      const nextLayer = layers[activeLayer].classList.contains('is-visible')
-        ? (activeLayer === 0 ? 1 : 0)
-        : activeLayer;
-      const preloader = new Image();
-
-      preloader.onload = () => {
-        if (token !== sessionToken) return;
-        setLayerImage(nextLayer, src);
-        layers[nextLayer].classList.add('is-visible');
-        layers[nextLayer === 0 ? 1 : 0]?.classList.remove('is-visible');
-        activeLayer = nextLayer;
-      };
-      preloader.src = src;
-    };
-
-    const startCategory = categoryKey => {
-      const ids = Array.isArray(categoryMap[categoryKey]) ? categoryMap[categoryKey] : [];
-      const imagesForCategory = ids.filter(Boolean).map(toUrl);
-      sessionToken += 1;
-      const token = sessionToken;
-      clearTimer();
-      currentIndex = 0;
-
-      if (!imagesForCategory.length || layers.length < 2) {
-        layers.forEach(layer => layer.classList.remove('is-visible'));
-        return;
-      }
-
-      showImage(imagesForCategory[currentIndex], token);
-      if (imagesForCategory.length > 1) {
-        rotationTimer = window.setInterval(() => {
-          if (token !== sessionToken) return;
-          currentIndex = (currentIndex + 1) % imagesForCategory.length;
-          showImage(imagesForCategory[currentIndex], token);
-        }, 4000);
-      }
-    };
-
-    workCategories.forEach(link => {
-      const key = link.dataset.workCategory;
-      link.addEventListener('mouseenter', () => startCategory(key));
-      link.addEventListener('mouseleave', fadeToBlack);
-      link.addEventListener('focus', () => startCategory(key));
-      link.addEventListener('blur', fadeToBlack);
     });
   }
 

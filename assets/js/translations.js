@@ -35,7 +35,10 @@ window.ColanPhTranslations = Object.freeze({
       wallLabel: 'Portfolio fotografico'
     },
     works: {
-      categoriesLabel: 'Categorie fotografiche'
+      categoriesLabel: 'Categorie fotografiche',
+      sectionsHeading: 'Sezioni',
+      projectsHeading: 'Progetti / Lavori',
+      emptyProjects: 'Nessun progetto pubblicato.'
     },
     categories: {
       events: 'Eventi',
@@ -126,7 +129,10 @@ window.ColanPhTranslations = Object.freeze({
       wallLabel: 'Photography portfolio'
     },
     works: {
-      categoriesLabel: 'Photography categories'
+      categoriesLabel: 'Photography categories',
+      sectionsHeading: 'Sections',
+      projectsHeading: 'Projects / Work',
+      emptyProjects: 'No projects published yet.'
     },
     categories: {
       events: 'Events',
