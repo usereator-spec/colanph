@@ -2284,3 +2284,159 @@ html[data-theme="retro"] .nav-action {
     ),
     var(--about-bg-image, none);
 }
+
+/* ============================================================
+   MOBILE FIX — Works / Work detail (14.09.2026)
+   - header controls aligned like Home
+   - equal spacing between Works categories
+   - previous/current/next kept on one aligned row
+   ============================================================ */
+@media (max-width: 768px) {
+  /* Header: logo left, EN/DARK immediately before hamburger on the right. */
+  .page-works .site-nav,
+  .page-work-detail .project-site-nav {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    min-height: 58px !important;
+    padding: 16px 20px !important;
+  }
+
+  .page-works .nav-logo,
+  .page-work-detail .project-site-nav .nav-logo {
+    position: relative !important;
+    flex: 0 0 auto !important;
+    z-index: 3001 !important;
+  }
+
+  .page-works .nav-actions,
+  .page-work-detail .project-site-nav .nav-actions {
+    position: absolute !important;
+    top: 50% !important;
+    right: 64px !important;
+    left: auto !important;
+    transform: translateY(-50%) !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 5px !important;
+    margin: 0 !important;
+    z-index: 3002 !important;
+  }
+
+  .page-works .nav-hamburger,
+  .page-work-detail .project-site-nav .nav-hamburger {
+    position: relative !important;
+    margin-left: auto !important;
+    flex: 0 0 auto !important;
+    z-index: 3003 !important;
+  }
+
+  /* Works index: remove the old inherited grid row sizing completely. */
+  .page-works .works-index {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    grid-template-columns: none !important;
+    grid-template-rows: none !important;
+    grid-auto-rows: auto !important;
+    row-gap: 0 !important;
+    column-gap: 0 !important;
+    gap: clamp(52px, 8svh, 76px) !important;
+    min-height: 0 !important;
+    width: 100% !important;
+  }
+
+  .page-works .works-category {
+    display: block !important;
+    width: 100% !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    text-align: center !important;
+    line-height: 1 !important;
+  }
+
+  /* Work detail pagination: force all three destinations onto one row. */
+  .page-work-detail .project-pagination {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr) !important;
+    grid-template-rows: 1fr !important;
+    align-items: center !important;
+    width: 100% !important;
+    gap: 6px !important;
+    padding: 18px 18px 24px !important;
+  }
+
+  .page-work-detail .project-pagination-prev,
+  .page-work-detail .project-pagination-current,
+  .page-work-detail .project-pagination-next {
+    grid-row: 1 !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    white-space: nowrap !important;
+    line-height: 1 !important;
+  }
+
+  .page-work-detail .project-pagination-prev {
+    grid-column: 1 !important;
+    justify-self: start !important;
+    justify-content: flex-start !important;
+    text-align: left !important;
+  }
+
+  .page-work-detail .project-pagination-current {
+    grid-column: 2 !important;
+    justify-self: center !important;
+    text-align: center !important;
+  }
+
+  .page-work-detail .project-pagination-next {
+    grid-column: 3 !important;
+    justify-self: end !important;
+    justify-content: flex-end !important;
+    text-align: right !important;
+  }
+
+  .page-work-detail .project-pagination-link,
+  .page-work-detail .project-pagination-current,
+  .page-work-detail .project-pagination-label {
+    font-size: clamp(18px, 5.6vw, 28px) !important;
+    white-space: nowrap !important;
+  }
+
+  .page-work-detail .project-pagination-link {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 5px !important;
+  }
+
+  .page-work-detail .project-pagination-arrow {
+    flex: 0 0 auto !important;
+    font-size: 1em !important;
+    line-height: 1 !important;
+  }
+}
+
+/* Very narrow phones: keep the same single-row layout without overlap. */
+@media (max-width: 390px) {
+  .page-works .nav-actions,
+  .page-work-detail .project-site-nav .nav-actions {
+    right: 58px !important;
+    gap: 4px !important;
+  }
+
+  .page-works .nav-action,
+  .page-work-detail .project-site-nav .nav-action {
+    min-width: 36px !important;
+    padding-inline: 5px !important;
+    font-size: 8px !important;
+  }
+
+  .page-work-detail .project-pagination-link,
+  .page-work-detail .project-pagination-current,
+  .page-work-detail .project-pagination-label {
+    font-size: clamp(16px, 5.2vw, 22px) !important;
+  }
+}
