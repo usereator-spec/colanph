@@ -2,6 +2,9 @@
   'use strict';
 
   const MAX_FILE_BYTES = 10 * 1024 * 1024;
+  const MAX_IMAGE_LONG_EDGE = 2560;
+  const WEBP_QUALITY = 0.84;
+  const ALLOWED_UPLOAD_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp']);
   const THEMES = [
     ['white', 'Bianco'],
     ['dark', 'Nero'],
@@ -394,9 +397,23 @@
     return label;
   }
 
-  function createPhotoRow(type, item, image) {
+  function reorderItemImages(type, item, from, to) {
+    if (!moveInArray(item.images, from, to)) return;
+    markDirty();
+    renderEditor(type);
+    setStatus('Ordine fotografie aggiornato. Lo stesso ordine verrà usato nella galleria e nell’animazione di sfondo di Works. Ricorda di pubblicare.');
+  }
+
+  function createPhotoRow(type, item, image, index) {
     const row = document.createElement('div');
     row.className = 'photo-row';
+    row.draggable = true;
+    row.dataset.index = index;
+
+    const handle = document.createElement('span');
+    handle.className = 'drag-handle photo-drag-handle';
+    handle.textContent = '⋮⋮';
+    handle.title = 'Trascina per riordinare';
 
     const img = document.createElement('img');
     img.className = 'admin-photo-preview';
@@ -423,12 +440,18 @@
       if (!destination.value) return;
       movePhoto(type, item, image, destination.value);
     });
+    const orderButtons = document.createElement('div');
+    orderButtons.className = 'photo-order-buttons';
+    orderButtons.append(
+      button('↑', 'Sposta foto prima', () => reorderItemImages(type, item, index, index - 1)),
+      button('↓', 'Sposta foto dopo', () => reorderItemImages(type, item, index, index + 1))
+    );
     const moveWrap = document.createElement('div');
     moveWrap.className = 'photo-move-control';
     moveWrap.append(destination, moveButton);
-    actions.append(moveWrap, button('Rimuovi foto', 'Rimuovi fotografia', () => removePhoto(type, item, image.publicId), 'danger-button'));
+    actions.append(orderButtons, moveWrap, button('Rimuovi foto', 'Rimuovi fotografia', () => removePhoto(type, item, image.publicId), 'danger-button'));
 
-    row.append(img, fields, actions);
+    row.append(handle, img, fields, actions);
     return row;
   }
 
@@ -520,13 +543,132 @@
     });
   }
 
+  function formatBytes(bytes) {
+    const value = Number(bytes) || 0;
+    if (value < 1024) return `${value} B`;
+    const units = ['KB', 'MB', 'GB'];
+    let size = value / 1024;
+    let unit = units[0];
+    for (let i = 1; i < units.length && size >= 1024; i += 1) {
+      size /= 1024;
+      unit = units[i];
+    }
+    return `${size >= 10 ? size.toFixed(1) : size.toFixed(2)} ${unit}`;
+  }
+
+  function webpFileName(name) {
+    const stem = String(name || 'foto').replace(/\.[^.]+$/, '') || 'foto';
+    return `${stem}.webp`;
+  }
+
+  async function decodeImage(file) {
+    if ('createImageBitmap' in window) {
+      try {
+        const bitmap = await createImageBitmap(file, { imageOrientation: 'from-image' });
+        return {
+          source: bitmap,
+          width: bitmap.width,
+          height: bitmap.height,
+          dispose: () => bitmap.close?.()
+        };
+      } catch (_) {
+        // Fallback below for browsers with partial createImageBitmap support.
+      }
+    }
+
+    const objectUrl = URL.createObjectURL(file);
+    try {
+      const image = new Image();
+      image.decoding = 'async';
+      await new Promise((resolve, reject) => {
+        image.onload = resolve;
+        image.onerror = () => reject(new Error(`Impossibile leggere ${file.name}.`));
+        image.src = objectUrl;
+      });
+      return {
+        source: image,
+        width: image.naturalWidth,
+        height: image.naturalHeight,
+        dispose: () => URL.revokeObjectURL(objectUrl)
+      };
+    } catch (error) {
+      URL.revokeObjectURL(objectUrl);
+      throw error;
+    }
+  }
+
+  function canvasToWebp(canvas) {
+    return new Promise((resolve, reject) => {
+      canvas.toBlob(blob => {
+        if (!blob) {
+          reject(new Error('Il browser non è riuscito a convertire la foto in WebP.'));
+          return;
+        }
+        if (blob.type && blob.type !== 'image/webp') {
+          reject(new Error('Questo browser non supporta la conversione WebP richiesta.'));
+          return;
+        }
+        resolve(blob);
+      }, 'image/webp', WEBP_QUALITY);
+    });
+  }
+
+  async function prepareImageForUpload(file) {
+    if (!ALLOWED_UPLOAD_TYPES.has(file.type)) {
+      throw new Error(`${file.name}: formato non supportato. Usa JPEG, PNG o WebP.`);
+    }
+
+    const decoded = await decodeImage(file);
+    try {
+      const sourceWidth = decoded.width;
+      const sourceHeight = decoded.height;
+      if (!sourceWidth || !sourceHeight) throw new Error(`${file.name}: dimensioni immagine non valide.`);
+
+      const longEdge = Math.max(sourceWidth, sourceHeight);
+      const scale = Math.min(1, MAX_IMAGE_LONG_EDGE / longEdge);
+      const width = Math.max(1, Math.round(sourceWidth * scale));
+      const height = Math.max(1, Math.round(sourceHeight * scale));
+
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      const context = canvas.getContext('2d', { alpha: true, colorSpace: 'srgb' }) || canvas.getContext('2d');
+      if (!context) throw new Error('Canvas non disponibile nel browser.');
+      context.imageSmoothingEnabled = true;
+      context.imageSmoothingQuality = 'high';
+      context.drawImage(decoded.source, 0, 0, width, height);
+
+      const blob = await canvasToWebp(canvas);
+      if (blob.size > MAX_FILE_BYTES) {
+        throw new Error(`${file.name}: anche dopo la compressione il file pesa ${formatBytes(blob.size)} e supera 10 MB.`);
+      }
+
+      return {
+        file: new File([blob], webpFileName(file.name), { type: 'image/webp', lastModified: Date.now() }),
+        originalBytes: file.size,
+        outputBytes: blob.size,
+        sourceWidth,
+        sourceHeight,
+        width,
+        height
+      };
+    } finally {
+      decoded.dispose?.();
+    }
+  }
+
   async function uploadFiles(type, item, files, progress) {
     if (!item.slug || !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(item.slug)) throw new Error('Prima inserisci uno slug URL valido.');
     const validFiles = [...files];
-    for (const file of validFiles) {
-      if (file.size > MAX_FILE_BYTES) throw new Error(`${file.name} supera 10 MB. Preparalo prima con lo script di compressione.`);
-      progress.textContent = `Caricamento ${file.name}…`;
-      const base = file.name.replace(/\.[^.]+$/, '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^A-Za-z0-9_-]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 40) || 'foto';
+    progress.classList.remove('is-error');
+
+    for (let index = 0; index < validFiles.length; index += 1) {
+      const originalFile = validFiles[index];
+      progress.textContent = `[${index + 1}/${validFiles.length}] Preparazione ${originalFile.name}…`;
+      const prepared = await prepareImageForUpload(originalFile);
+      progress.textContent = `[${index + 1}/${validFiles.length}] ${originalFile.name}: ${formatBytes(prepared.originalBytes)} → ${formatBytes(prepared.outputBytes)} · ${prepared.sourceWidth}×${prepared.sourceHeight} → ${prepared.width}×${prepared.height}. Caricamento…`;
+
+      const base = originalFile.name.replace(/\.[^.]+$/, '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^A-Za-z0-9_-]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 40) || 'foto';
       const uid = crypto.randomUUID().replace(/-/g, '').slice(0, 12);
       const folder = type === 'project' ? 'projects' : 'sections';
       const publicId = `colanph/${folder}/${item.slug}/${base}-${uid}`;
@@ -535,19 +677,22 @@
       });
       const signed = await signResponse.json();
       if (!signResponse.ok) throw new Error(signed.error || 'Firma Cloudinary non disponibile.');
+
       const form = new FormData();
-      form.append('file', file);
+      form.append('file', prepared.file);
       form.append('api_key', signed.apiKey);
       form.append('timestamp', String(signed.timestamp));
       form.append('signature', signed.signature);
       form.append('public_id', signed.publicId);
+
       const uploadResponse = await fetch(`https://api.cloudinary.com/v1_1/${encodeURIComponent(signed.cloudName)}/image/upload`, { method: 'POST', body: form });
       const uploaded = await uploadResponse.json();
-      if (!uploadResponse.ok) throw new Error(uploaded?.error?.message || `Upload fallito: ${file.name}`);
+      if (!uploadResponse.ok) throw new Error(uploaded?.error?.message || `Upload fallito: ${originalFile.name}`);
       item.images.push({ id: uploaded.public_id, publicId: uploaded.public_id, width: uploaded.width, height: uploaded.height, caption: { it: '', en: '' } });
       markDirty();
     }
-    progress.textContent = validFiles.length ? 'Upload completato. Ricorda di pubblicare le modifiche.' : '';
+
+    progress.textContent = validFiles.length ? `${validFiles.length} foto preparate in WebP (max 2560 px, qualità 84) e caricate. Ricorda di pubblicare le modifiche.` : '';
   }
 
   function renderEditor(type) {
@@ -611,7 +756,8 @@
     }
 
     const photoList = fragment.querySelector('[data-photo-list]');
-    photoList.replaceChildren(...item.images.map(image => createPhotoRow(type, item, image)));
+    photoList.replaceChildren(...item.images.map((image, index) => createPhotoRow(type, item, image, index)));
+    wireDrag(photoList, (from, to) => reorderItemImages(type, item, from, to));
     if (!item.images.length) {
       const empty = document.createElement('p');
       empty.className = 'admin-empty';

@@ -199,3 +199,44 @@ select:focus { border-color: var(--text); }
 @media (max-width: 620px) {
   .inline-action-row { grid-template-columns: 1fr; }
 }
+
+/* --- Upload automatico + ordinamento foto per sezione/progetto --- */
+.photo-order-note {
+  margin: 0 0 12px;
+  color: var(--muted);
+  font-size: .74rem;
+  line-height: 1.55;
+}
+
+.photo-row {
+  grid-template-columns: 28px 220px minmax(0, 1fr) auto;
+}
+
+.photo-row.is-dragging { opacity: .45; }
+.photo-drag-handle { align-self: center; }
+
+.photo-order-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 7px;
+}
+
+.photo-order-buttons button {
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--text);
+  padding: 8px 10px;
+}
+
+@media (max-width: 900px) {
+  .photo-row { grid-template-columns: 28px 140px 1fr; }
+  .photo-row-actions { grid-column: 1 / -1; }
+}
+
+@media (max-width: 620px) {
+  .photo-row { grid-template-columns: 24px 1fr; }
+  .photo-drag-handle { grid-row: 1 / span 2; }
+  .admin-photo-preview { grid-column: 2; }
+  .photo-fields { grid-column: 2; }
+  .photo-row-actions { grid-column: 1 / -1; }
+}

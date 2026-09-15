@@ -137,10 +137,11 @@
       </div>
 
       <div class="photo-editor-heading">
-        <div><h3>Fotografie</h3><p>Massimo 10 MB per file. Per file più grandi usa prima lo script di preparazione.</p></div>
-        <label class="upload-button">+ Aggiungi foto<input data-upload-input type="file" accept="image/jpeg,image/png,image/webp,image/avif" multiple hidden /></label>
+        <div><h3>Fotografie</h3><p>JPEG, PNG e WebP vengono convertiti automaticamente in WebP qualità 84, lato lungo massimo 2560 px, prima del caricamento. Anche file originali oltre 10 MB vengono compressi nel browser.</p></div>
+        <label class="upload-button">+ Aggiungi foto<input data-upload-input type="file" accept="image/jpeg,image/png,image/webp" multiple hidden /></label>
       </div>
       <div class="upload-progress" data-upload-progress></div>
+      <p class="photo-order-note">Trascina le fotografie oppure usa ↑ e ↓ per scegliere l'ordine della galleria. Questo stesso ordine viene usato anche per la rotazione dello sfondo nella pagina Works.</p>
       <div class="sortable-list photo-sortable" data-photo-list></div>
     </div>
   </template>
